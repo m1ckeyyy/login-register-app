@@ -1,29 +1,38 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+// app.use(express.static(path.join(__dirname, "js")));
+app.use(express.static("public"));
 
-// Define a route for the root path
 app.get("/", (request, response) => {
-	// Send the index.html file as the response
 	response.sendFile("index.html", { root: __dirname });
 });
-
-// Define a route for the '/login' path
-app.get("/login", (request, response) => {
-	// Get the username and password from the query string
-	const username = request.query.username;
-	const password = request.query.password;
-
-	if (username === "admin" && password === "password") {
-		// If the username and password are correct, send a success message
-		response.send("Login successful");
-	} else {
-		// If the username and password are incorrect, send an error message
-		response.status(401).send("Error: Invalid username or password");
-	}
+app.get("/script.js", (request, response) => {
+	// Adding script.js to the server like this because of problem with file type or directory
+	response.type("application/javascript");
+	response.sendFile("script.js", { root: __dirname });
 });
 
-// Start the server and listen for incoming requests on port 8080.
+app.get("/login", (request, response) => {
+	response.sendFile("login.html", { root: __dirname });
+
+	// const username = request.query.username;
+	// const password = request.query.password;
+	// console.log("u", username);
+	// if (username === "admin" && password === "password") {
+	// 	// If the username and password are correct, send a success message
+	// 	response.send("Login successful");
+	// } else {
+	// 	// If the username and password are incorrect, send an error message
+	// 	response.status(401).send("Error: Invalid username or password");
+	// }
+});
+app.post("/login", (request, response) => {
+	//
+	console.log(request.body.username, request.body.password);
+	//now save and check in database
+});
+
 app.listen(8080, () => {
 	console.log("Server listening on port 8080");
 });
