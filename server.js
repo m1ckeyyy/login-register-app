@@ -16,15 +16,58 @@ async function connect() {
 }
 connect();
 
-const userSchema = new mongoose.Schema({
-	username: String,
-	password: String,
-});
-const User = mongoose.model("User", userSchema);
+const User = require("./User");
+
+// const userSchema = new mongoose.Schema({
+// 	username: String,
+// 	password: String,
+// });
+// const User = mongoose.model("User", userSchema);
 
 app.get("/", (request, response) => {
 	response.sendFile("index.html", { root: __dirname });
 });
+
+app.get("/src/register-script.js", (request, response) => {
+	// Adding script.js to the server like this because of problem with file type or directory
+	response.type("application/javascript");
+	response.sendFile("src/register-script.js", { root: __dirname });
+});
+
+app.get("/register", (request, response) => {
+	response.sendFile("register.html", { root: __dirname });
+
+	// const username = request.query.username;
+	// const password = request.query.password;
+	// console.log("u", username);
+	// if (username === "admin" && password === "password") {
+	// 	// If the username and password are correct, send a success message
+	// 	response.send("Login successful");
+	// } else {
+	// 	// If the username and password are incorrect, send an error message
+	// 	response.status(401).send("Error: Invalid username or password");
+	// }
+});
+
+app.post("/register", (request, response) => {
+	// console.log("registered: ", request.body.username, request.body.password);
+
+	const newUser = new User({
+		username: request.body.username,
+		password: request.body.password,
+	});
+	newUser.save((error) => {
+		if (error) {
+			// There was an error saving the user
+			response.status(500).send("Error saving user to database");
+		} else {
+			// The user was saved successfully
+			console.log("user yes");
+			response.send("User registered successfully");
+		}
+	});
+});
+
 app.get("/src/login-script.js", (request, response) => {
 	// Adding script.js to the server like this because of problem with file type or directory
 	response.type("application/javascript");
@@ -50,44 +93,6 @@ app.post("/login", (request, response) => {
 			console.log("user not found!!!");
 		} else {
 			console.log("Login successful!!");
-		}
-	});
-});
-app.get("/src/register-script.js", (request, response) => {
-	// Adding script.js to the server like this because of problem with file type or directory
-	response.type("application/javascript");
-	response.sendFile("src/register-script.js", { root: __dirname });
-});
-
-app.get("/register", (request, response) => {
-	response.sendFile("register.html", { root: __dirname });
-
-	// const username = request.query.username;
-	// const password = request.query.password;
-	// console.log("u", username);
-	// if (username === "admin" && password === "password") {
-	// 	// If the username and password are correct, send a success message
-	// 	response.send("Login successful");
-	// } else {
-	// 	// If the username and password are incorrect, send an error message
-	// 	response.status(401).send("Error: Invalid username or password");
-	// }
-});
-app.post("/register", (request, response) => {
-	// console.log("registered: ", request.body.username, request.body.password);
-
-	const newUser = new User({
-		username: request.body.username,
-		password: request.body.password,
-	});
-	newUser.save((error) => {
-		if (error) {
-			// There was an error saving the user
-			response.status(500).send("Error saving user to database");
-		} else {
-			// The user was saved successfully
-			console.log("user yes");
-			response.send("User registered successfully");
 		}
 	});
 });
