@@ -41,10 +41,10 @@ It features a frontend implemented using HTML, CSS, and JavaScript, and a backen
 
 - Paste the code below replacing with your personal mongoDB URI
 
-- `module.exports = {
+	- `module.exports = {
 	mongoURI:
 		"mongodb+srv://<username>:<password>@<your-cluster-url>
-};`
+	};`
 
 ### You can customize the port number and other settings in `server.js`.
 
