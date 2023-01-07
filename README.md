@@ -39,4 +39,4 @@ It features a frontend implemented using HTML, CSS, and JavaScript, and a backen
 
 You can customize the port number and other settings in `server.js`.
 
-### License: [MIT][(https://github.com/m1ckeyyy/habit-tracker/LICENSE.txt)]
+### License: [MIT](https://github.com/m1ckeyyy/habit-tracker/LICENSE.txt)
