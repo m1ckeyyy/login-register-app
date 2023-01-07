@@ -1,3 +1,4 @@
+const { response } = require("express");
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
@@ -5,49 +6,30 @@ app.use(express.json());
 
 const uri =
 	"mongodb+srv://mikolaj:qGrF7clrl1sjp8R9@mikolaj-cluster.sofrp4a.mongodb.net/?retryWrites=true&w=majority";
+mongoose
+	.connect(uri)
+	.then(() => console.log("Successfully connected to MongoDB"))
+	.catch((error) => console.error(error));
 
-async function connect() {
-	try {
-		await mongoose.connect(uri);
-		console.log("Successfully connected to MongoDB");
-	} catch (err) {
-		console.error(error);
-	}
-}
-connect();
+// connect();
 
 const User = require("./User");
-
-// const userSchema = new mongoose.Schema({
-// 	username: String,
-// 	password: String,
-// });
-// const User = mongoose.model("User", userSchema);
 
 app.get("/", (request, response) => {
 	response.sendFile("index.html", { root: __dirname });
 });
 
-app.get("/src/register-script.js", (request, response) => {
-	// Adding script.js to the server like this because of problem with file type or directory
-	response.type("application/javascript");
-	response.sendFile("src/register-script.js", { root: __dirname });
+app.get(["/register", "/login"], (request, response) => {
+	response.sendFile(`${request.path.substring(1)}.html`, { root: __dirname });
 });
 
-app.get("/register", (request, response) => {
-	response.sendFile("register.html", { root: __dirname });
-
-	// const username = request.query.username;
-	// const password = request.query.password;
-	// console.log("u", username);
-	// if (username === "admin" && password === "password") {
-	// 	// If the username and password are correct, send a success message
-	// 	response.send("Login successful");
-	// } else {
-	// 	// If the username and password are incorrect, send an error message
-	// 	response.status(401).send("Error: Invalid username or password");
-	// }
-});
+app.get(
+	["/src/register-script.js", "/src/login-script.js"],
+	(request, response) => {
+		response.type("application/javascript");
+		response.sendFile(request.path, { root: __dirname });
+	}
+);
 
 app.post("/register", (request, response) => {
 	// console.log("registered: ", request.body.username, request.body.password);
@@ -68,15 +50,13 @@ app.post("/register", (request, response) => {
 	});
 });
 
-app.get("/src/login-script.js", (request, response) => {
-	// Adding script.js to the server like this because of problem with file type or directory
-	response.type("application/javascript");
-	response.sendFile("src/login-script.js", { root: __dirname });
-});
+// app.get("/register", (request, response) => {
+// 	response.sendFile("register.html", { root: __dirname });
+// });
 
-app.get("/login", (request, response) => {
-	response.sendFile("login.html", { root: __dirname });
-});
+// app.get("/login", (request, response) => {
+// 	response.sendFile("login.html", { root: __dirname });
+// });
 app.post("/login", (request, response) => {
 	console.log("logged in: ", request.body.username, request.body.password);
 	//now save and check in database
