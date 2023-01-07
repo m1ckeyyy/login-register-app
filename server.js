@@ -1,17 +1,14 @@
-const { response } = require("express");
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+const port = process.env.PORT || 8080;
+const config = require("./config");
+const uri = config.mongoURI;
 app.use(express.json());
-
-const uri =
-	"mongodb+srv://mikolaj:qGrF7clrl1sjp8R9@mikolaj-cluster.sofrp4a.mongodb.net/?retryWrites=true&w=majority";
 mongoose
 	.connect(uri)
 	.then(() => console.log("Successfully connected to MongoDB"))
 	.catch((error) => console.error(error));
-
-// connect();
 
 const User = require("./User");
 
@@ -50,15 +47,13 @@ app.post("/register", (request, response) => {
 	});
 });
 
-// app.get("/register", (request, response) => {
-// 	response.sendFile("register.html", { root: __dirname });
-// });
-
-// app.get("/login", (request, response) => {
-// 	response.sendFile("login.html", { root: __dirname });
-// });
 app.post("/login", (request, response) => {
-	console.log("logged in: ", request.body.username, request.body.password);
+	console.log(
+		"logging in: ",
+		request.body.username,
+		request.body.password,
+		"..."
+	);
 	//now save and check in database
 
 	const username = request.body.username;
@@ -67,7 +62,7 @@ app.post("/login", (request, response) => {
 	User.findOne({ username, password }, (err, user) => {
 		if (err) {
 			response.status(500).send("Error: " + err);
-			console.log("error during browsing through db");
+			console.log("error with MongoDB");
 		} else if (!user) {
 			response.status(401).send("Error: Invalid username or password");
 			console.log("user not found!!!");
@@ -77,6 +72,6 @@ app.post("/login", (request, response) => {
 	});
 });
 
-app.listen(8080, () => {
+app.listen(port, () => {
 	console.log("Server listening on port 8080");
 });
