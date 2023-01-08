@@ -1,10 +1,20 @@
 const express = require("express");
 const mongoose = require("mongoose");
+// const session = require("express-session");
 const app = express();
 const port = process.env.PORT || 8080;
 const config = require("./config");
 const uri = config.mongoURI;
 app.use(express.json());
+
+// app.use(
+// 	session({
+// 		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
+// 		resave: false, // don't save the session if it wasn't modified
+// 		saveUninitialized: false, // don't create a session until something is stored
+// 	})
+// );
+
 mongoose
 	.connect(uri)
 	.then(() => console.log("Successfully connected to MongoDB"))
