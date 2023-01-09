@@ -14,7 +14,7 @@ app.use(express.json());
 // 		saveUninitialized: false, // don't create a session until something is stored
 // 	})
 // );
-
+mongoose.set("strictQuery", true); //to suppress warning in console
 mongoose
 	.connect(uri)
 	.then(() => console.log("Successfully connected to MongoDB"))
