@@ -9,7 +9,7 @@ form.addEventListener("submit", (event) => {
 	console.log(data);
 	document.querySelector("#username").value = "";
 	document.querySelector("#password").value = "";
-
+	//add conditions for username and password
 	// Send a POST request to the server with the form data
 	fetch("/login", {
 		method: "POST",

@@ -11,13 +11,14 @@ const uri = config.mongoURI;
 app.use(express.json());
 mongoose.set("strictQuery", false); //supress warning
 
-// app.use(
-// 	session({
-// 		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
-// 		resave: false, // don't save the session if it wasn't modified
-// 		saveUninitialized: false, // don't create a session until something is stored
-// 	})
-// );
+app.use(
+	session({
+		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
+		cookie: { maxAge: 30000 },
+		resave: false, // don't save the session if it wasn't modified
+		saveUninitialized: true, // don't create a session until something is stored
+	})
+);
 mongoose.set("strictQuery", true); //to suppress warning in console
 mongoose
 	.connect(uri)
@@ -25,6 +26,7 @@ mongoose
 	.catch((error) => console.error(error));
 
 const User = require("./User");
+const { response } = require("express");
 
 app.get("/", (request, response) => {
 	response.sendFile("index.html", { root: __dirname });
@@ -62,15 +64,18 @@ app.post("/register", (request, response) => {
 });
 
 app.post("/login", (request, response) => {
+	//check first if user is logged in
 	console.log(
 		"logging in: ",
 		request.body.username,
 		request.body.password,
 		"..."
 	);
+	let username, password;
 	try {
-		const username = request.body.username;
-		const password = request.body.password;
+		username = request.body.username;
+		password = request.body.password;
+		if (!username || !password) return response.status(404).send("A123");
 		//first find username
 		User.findOne({ username }).then((user) => {
 			if (!user) {
@@ -78,12 +83,20 @@ app.post("/login", (request, response) => {
 				return response.status(404).send("User not found");
 			}
 			bcrypt.compare(password, user.password).then((isMatching) => {
-				if (isMatching) {
-					response.send("Logged in successfully");
-					// console.log("logged in");
+				if (request.session.authenticated) {
+					response.json(request.session);
 				} else {
-					response.status(401).send("Incorrect password");
-					// console.log("incorrect password");
+					if (isMatching) {
+						request.session.authenticated = true;
+						request.session.user = {
+							username,
+							password,
+						};
+						response.json(request.session);
+						// response.send("Logged in successfully");
+					} else {
+						response.status(401).send("Incorrect password");
+					}
 				}
 			});
 		});
@@ -91,6 +104,17 @@ app.post("/login", (request, response) => {
 		response.status(500).send("An error occured");
 		console.log(err);
 	}
+	// console.log(request.sessionID, request.session.authenticated);
+	// if (request.session.authenticated) {
+	// 	response.json(request.session);
+	// } else {
+	// 	if(password)
+	// 	request.session.user = {
+	// 		username,
+	// 		password,
+	// 	};
+	// }
+	// response.status(200); //success
 });
 
 app.listen(port, () => {
