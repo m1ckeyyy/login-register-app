@@ -4,14 +4,18 @@ const userSchema = new mongoose.Schema({
 	username: String,
 	password: String,
 });
-const User = mongoose.model("User", userSchema);
 userSchema.pre("save", function (next) {
-	if (this.isModified("password")) {
-		bcrypt.hash(this.password, 8, (err, hash) => {
-			if (err) return next(err);
-			this.password = hash;
-			next();
-		});
-	}
+	const user = this;
+
+	bcrypt.hash(user.password, 10, function (error, hashedPassword) {
+		if (error) {
+			return next(error);
+		}
+		user.password = hashedPassword;
+		next();
+	});
 });
+
+const User = mongoose.model("User", userSchema);
+
 module.exports = mongoose.model("User", userSchema);
