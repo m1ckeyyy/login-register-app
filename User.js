@@ -1,16 +1,33 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
-	username: String,
-	password: String,
+	username: {
+		type: String,
+		required: true,
+		minlength: 5,
+	},
+	password: {
+		type: String,
+		required: true,
+		minlength: 8,
+		validate: {
+			validator: function (value) {
+				return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-]).{8,}$/.test(value);
+			},
+			message:
+				"Password must have at least one number, one lowercase and one uppercase letter, and at least 8 characters",
+		},
+	},
 });
 userSchema.pre("save", function (next) {
 	const user = this;
 
 	bcrypt.hash(user.password, 10, function (error, hashedPassword) {
 		if (error) {
+			console.log("hashed fail");
 			return next(error);
 		}
+		console.log("hash sucesfuli set");
 		user.password = hashedPassword;
 		next();
 	});

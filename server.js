@@ -45,12 +45,13 @@ app.get(
 );
 
 app.post("/register", (request, response) => {
-	// console.log("registered: ", request.body.username, request.body.password);
+	// console.log("registering: ", request.body.username, request.body.password);
 
 	const newUser = new User({
 		username: request.body.username,
 		password: request.body.password,
 	});
+	console.log(newUser);
 	newUser.save((error) => {
 		if (error) {
 			// There was an error saving the user

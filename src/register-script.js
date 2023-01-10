@@ -10,7 +10,9 @@ form.addEventListener("submit", (event) => {
 	document.querySelector("#username").value = "";
 	document.querySelector("#password").value = "";
 	//add conditions for username and password
-
+	//login min length 5
+	//password min length 8
+	//
 	// Send a POST request to the server with the form data
 	fetch("/register", {
 		method: "POST",
