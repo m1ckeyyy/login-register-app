@@ -2,15 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
-
-// const session = require("express-session");
+const { response } = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
 const config = require("./config");
 const uri = config.mongoURI;
-app.use(express.json());
-mongoose.set("strictQuery", false); //supress warning
 
+app.use(express.json());
 app.use(
 	session({
 		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
@@ -19,14 +17,13 @@ app.use(
 		saveUninitialized: true, // don't create a session until something is stored
 	})
 );
-mongoose.set("strictQuery", true); //to suppress warning in console
+mongoose.set("strictQuery", false); //supress warning
 mongoose
 	.connect(uri)
 	.then(() => console.log("Successfully connected to MongoDB"))
 	.catch((error) => console.error(error));
 
 const User = require("./User");
-const { response } = require("express");
 
 app.get("/", (request, response) => {
 	response.sendFile("index.html", { root: __dirname });
