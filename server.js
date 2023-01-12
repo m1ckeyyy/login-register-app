@@ -2,31 +2,28 @@ const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
-
-// const session = require("express-session");
+const { response } = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
 const config = require("./config");
 const uri = config.mongoURI;
-app.use(express.json());
-mongoose.set("strictQuery", false); //supress warning
 
+app.use(express.json());
 app.use(
 	session({
 		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
-		cookie: { maxAge: 30000 },
+		cookie: { maxAge: 10000 },
 		resave: false, // don't save the session if it wasn't modified
 		saveUninitialized: true, // don't create a session until something is stored
 	})
 );
-mongoose.set("strictQuery", true); //to suppress warning in console
+mongoose.set("strictQuery", false); //supress warning
 mongoose
 	.connect(uri)
 	.then(() => console.log("Successfully connected to MongoDB"))
 	.catch((error) => console.error(error));
 
 const User = require("./User");
-const { response } = require("express");
 
 app.get("/", (request, response) => {
 	response.sendFile("index.html", { root: __dirname });
@@ -47,11 +44,15 @@ app.get(
 app.post("/register", (request, response) => {
 	// console.log("registering: ", request.body.username, request.body.password);
 
-	const newUser = new User({
-		username: request.body.username,
-		password: request.body.password,
-	});
-	console.log(newUser);
+	const { username, password } = request.body;
+	const newUser = new User({ username, password });
+
+	console.log("server.js,/register,newUser: ", newUser);
+	const validationError = newUser.validateSync({ username, password });
+	if (validationError) {
+		const { message } = validationError.errors.password;
+		return response.status(400).send({ error: message });
+	}
 	newUser.save((error) => {
 		if (error) {
 			// There was an error saving the user
