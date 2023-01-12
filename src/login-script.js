@@ -17,7 +17,9 @@ form.addEventListener("submit", (event) => {
 		headers: {
 			"Content-Type": "application/json",
 		},
-	}).catch((err) => {
-		console.error("POINTLESS error: ", err);
-	});
+	})
+		.then((response) => (window.location = response.url))
+		.catch((err) => {
+			console.error("POINTLESS error: ", err);
+		});
 });
