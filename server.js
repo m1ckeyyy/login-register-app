@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(
 	session({
 		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
-		cookie: { maxAge: 30000 },
+		cookie: { maxAge: 10000 },
 		resave: false, // don't save the session if it wasn't modified
 		saveUninitialized: true, // don't create a session until something is stored
 	})
@@ -44,11 +44,15 @@ app.get(
 app.post("/register", (request, response) => {
 	// console.log("registering: ", request.body.username, request.body.password);
 
-	const newUser = new User({
-		username: request.body.username,
-		password: request.body.password,
-	});
-	console.log(newUser);
+	const { username, password } = request.body;
+	const newUser = new User({ username, password });
+
+	console.log("server.js,/register,newUser: ", newUser);
+	const validationError = newUser.validateSync({ username, password });
+	if (validationError) {
+		const { message } = validationError.errors.password;
+		return response.status(400).send({ error: message });
+	}
 	newUser.save((error) => {
 		if (error) {
 			// There was an error saving the user

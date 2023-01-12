@@ -7,20 +7,32 @@ form.addEventListener("submit", (event) => {
 		data[key] = value;
 	}
 	console.log(data);
-	document.querySelector("#username").value = "";
-	document.querySelector("#password").value = "";
+
 	//add conditions for username and password
 	//login min length 5
 	//password min length 8
 	//
 	// Send a POST request to the server with the form data
-	fetch("/register", {
-		method: "POST",
-		body: JSON.stringify(data),
-		headers: {
-			"Content-Type": "application/json",
-		},
-	}).catch((err) => {
-		console.error("POINTLESS error: ", err);
-	});
+	console.log(data.password.length);
+	if (
+		/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-]).{8,}$/.test(data.password) ||
+		true
+	) {
+		console.log("test true");
+		document.querySelector("#username").value = "";
+		document.querySelector("#password").value = "";
+
+		fetch("/register", {
+			method: "POST",
+			body: JSON.stringify(data),
+			headers: {
+				"Content-Type": "application/json",
+			},
+		}).catch((err) => {
+			console.error("POINTLESS error: ", err);
+		});
+	} else {
+		console.log("test false");
+		document.querySelector(".disclaimer").style.display = "block";
+	}
 });
