@@ -46,7 +46,7 @@ app.get(
 app.post("/register", (request, response) => {
   const { username, password } = request.body;
   const newUser = new User({ username, password });
-  
+
   console.log("server.js,/register,newUser: ", newUser);
   const validationError = newUser.validateSync({ username, password });
   if (validationError) {
@@ -59,7 +59,10 @@ app.post("/register", (request, response) => {
       response.status(500).send("Error saving user to database");
     } else {
       console.log("user yes");
-      response.send("User registered successfully");
+      response.status(200).json({ redirect: "/login" });
+
+      //   response.status(200).json({ redirect: "/login" });
+      //   response.status(200).json({ redirect: "/login" });
     }
   });
 });
@@ -90,15 +93,6 @@ app.post("/login", (request, response) => {
           };
           //add a flash message, to append a success login message in the navigation bar
           response.status(200).json({ redirect: "/" });
-          try {
-            console.log(response.statusCode);
-            response.status(200).json({ redirect: "/" });
-
-            // response.redirect("/");
-            console.log(response.statusCode);
-          } catch (e) {
-            console.log(e);
-          }
         } else {
           response.status(401).send("Incorrect password");
         }

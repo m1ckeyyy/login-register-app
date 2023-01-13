@@ -19,12 +19,24 @@ form.addEventListener("submit", (event) => {
       headers: {
         "Content-Type": "application/json",
       },
-    }).catch((err) => {
-      console.error("POINTLESS error: ", err);
-    });
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (data.redirect === "/login") {
+          window.location.href = "/login";
+          //FLASH
+        }
+      })
+      .catch((err) => {
+        console.error("POINTLESS error: ", err);
+      });
   } else {
     console.log("test false");
     document.querySelector(".disclaimer-invalid-password").style.display =
       "block";
-  } 
+  }
 });

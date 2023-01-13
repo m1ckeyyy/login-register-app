@@ -18,13 +18,14 @@ const userSchema = new mongoose.Schema({
   },
 });
 userSchema.pre("save", function (next) {
-  bcrypt.hash(this.password, 10, function (error, hashedPassword) {
+  let self = this;
+  bcrypt.hash(self.password, 10, function (error, hashedPassword) {
     if (error) {
       console.log("hashed fail");
       return next(error);
     }
     console.log("hash sucesfuli set");
-    this.password = hashedPassword;
+    self.password = hashedPassword;
     next();
   });
 });
