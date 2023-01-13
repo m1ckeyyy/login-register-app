@@ -8,16 +8,7 @@ form.addEventListener("submit", (event) => {
 	}
 	console.log(data);
 
-	//add conditions for username and password
-	//login min length 5
-	//password min length 8
-	//
-	// Send a POST request to the server with the form data
-	console.log(data.password.length);
-	if (
-		/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[-]).{8,}$/.test(data.password) ||
-		true
-	) {
+	if (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(data.password)) {
 		console.log("test true");
 		document.querySelector("#username").value = "";
 		document.querySelector("#password").value = "";
@@ -33,6 +24,7 @@ form.addEventListener("submit", (event) => {
 		});
 	} else {
 		console.log("test false");
-		document.querySelector(".disclaimer").style.display = "block";
+		document.querySelector(".disclaimer-invalid-password").style.display =
+			"block";
 	}
 });
