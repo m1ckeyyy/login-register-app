@@ -2,12 +2,19 @@ const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
+// const flash = require('connect-flash');
 const { response } = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
 const port = process.env.PORT || 8080;
 const config = require("./config");
 const uri = config.mongoURI;
+
+app.use(require("connect-flash")());
+// app.use(function (req, res, next) {
+//   res.locals.messages = require("express-messages")(req, res);
+//   next();
+// });//
 
 app.use(cookieParser());
 app.use(express.json());
@@ -28,7 +35,9 @@ mongoose
 const User = require("./User");
 
 app.get("/", authenticate, (request, response) => {
+  //   const messages = request.flash("success");
   response.sendFile("index.html", { root: __dirname });
+  //   res.write(`<script> var messages = ${JSON.stringify(messages)} </script>`);
 });
 
 app.get(["/register", "/login"], notAuthenticated, (request, response) => {
@@ -59,10 +68,8 @@ app.post("/register", (request, response) => {
       response.status(500).send("Error saving user to database");
     } else {
       console.log("user yes");
+      //   request.flash("success", "You are now registered and can log in");
       response.status(200).json({ redirect: "/login" });
-
-      //   response.status(200).json({ redirect: "/login" });
-      //   response.status(200).json({ redirect: "/login" });
     }
   });
 });

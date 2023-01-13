@@ -27,8 +27,8 @@ form.addEventListener("submit", (event) => {
       })
       .then((data) => {
         if (data.redirect === "/login") {
-          window.location.href = "/login";
           //FLASH
+          window.location.href = "/login";
         }
       })
       .catch((err) => {
