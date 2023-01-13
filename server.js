@@ -46,11 +46,12 @@ app.get(
 app.post("/register", (request, response) => {
   const { username, password } = request.body;
   const newUser = new User({ username, password });
-
+  
   console.log("server.js,/register,newUser: ", newUser);
   const validationError = newUser.validateSync({ username, password });
   if (validationError) {
     const { message } = validationError.errors.password;
+    console.log(message);
     return response.status(400).send({ error: message });
   }
   newUser.save((error) => {
