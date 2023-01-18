@@ -7,9 +7,10 @@ const { response } = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
 const port = process.env.PORT || 8080;
+const cors = require("cors");
 const config = require("./config");
 const uri = config.mongoURI;
-
+app.use(cors());
 app.use(require("connect-flash")());
 // app.use(function (req, res, next) {
 //   res.locals.messages = require("express-messages")(req, res);
@@ -121,7 +122,10 @@ app.get("/logout", (request, response) => {
     }
   });
 });
-
+app.get("/test-connection", (request, response) => {
+  response.setHeader("Content-Type", "application/json");
+  response.send({ siema: ["eniu", "enku", "enieczku"] });
+});
 app.listen(port, () => {
   console.log("Server listening on port 8080");
 });
