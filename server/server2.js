@@ -11,7 +11,18 @@ const cors = require("cors");
 const config = require("./config");
 const uri = config.mongoURI;
 app.use(cors());
+// app.use(
+//   cors({
+//     origin: "https://fnvzol-5174.preview.csb.app/*",
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//   })
+// );
 app.use(require("connect-flash")());
+// app.use(function (req, res, next) {
+//   res.locals.messages = require("express-messages")(req, res);
+//   next();
+// });//
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -30,11 +41,22 @@ mongoose
 
 const User = require("./User");
 
-app.post("/", (request, response) => {
-	const userCookie = request.cookies.user;
-	console.log(userCookie);
-	response.status(200).send({ message: `${userCookie}` });
+app.get("/", authenticate, (request, response) => {
+	//   const messages = request.flash("success");
+	response.sendFile("index.html", { root: __dirname });
 });
+
+// app.get(["/register", "/login"], notAuthenticated, (request, response) => {
+// 	response.sendFile(`${request.path.substring(1)}.html`, { root: __dirname });
+// });
+
+// app.get(
+// 	["/src/register-script.js", "/src/login-script.js"],
+// 	(request, response) => {
+// 		response.type("application/javascript");
+// 		response.sendFile(request.path, { root: __dirname });
+// 	}
+// );
 
 app.post("/register", (request, response) => {
 	const { username, password } = request.body;
@@ -58,24 +80,22 @@ app.post("/register", (request, response) => {
 	});
 });
 
-app.post("/login", (request, response) => {
+app.post("/loginY", (request, response) => {
 	console.log(
 		"logging in: ",
 		request.body.username,
 		request.body.password,
 		"..."
 	);
+	let username, password;
 	try {
-		let { username, password } = request.body;
+		username = request.body.username;
+		password = request.body.password;
 
 		User.findOne({ username }).then((user) => {
 			if (!user) {
-				return response.status(404).send({
-					access: false,
-					message: `user ${username} not found, authorization failed`,
-				});
+				return response.status(404).send("User not found");
 			}
-
 			bcrypt.compare(password, user.password).then((isMatching) => {
 				if (isMatching) {
 					password = user.password;
@@ -85,23 +105,14 @@ app.post("/login", (request, response) => {
 						password,
 					};
 					//add a flash message, to append a success login message in the navigation bar
-					console.log(request.session.user);
-					response.cookie("user ", username, {
-						maxAge: 900000,
-						// httpOnly: true,
-					});
-					response.status(200).send({
-						message: `${request.session.user}`,
-					});
+					response.status(200).json({ redirect: "/" });
 				} else {
-					response
-						.status(401)
-						.send({ access: false, message: "Incorrect password" });
+					response.status(401).send("Incorrect password");
 				}
 			});
 		});
 	} catch (err) {
-		response.status(500).send({ access: false, message: "An error occured" });
+		response.status(500).send("An error occured");
 		console.log(err);
 	}
 });
@@ -116,9 +127,27 @@ app.get("/logout", (request, response) => {
 		}
 	});
 });
+app.get("/test-connection", (request, response) => {
+	response.setHeader("Content-Type", "application/json");
+	response.send({ siema: ["eniu", "enku", "enieczku"] });
+});
+
+app.post("/login", (req, res) => {
+	console.log("Bbb", req.body);
+	const { username, password } = req.body;
+	res.status(200).send({
+		access: true,
+		message: `user ${username} successfully login, authorization granted <cookie>`,
+	});
+});
+// app.get("/loginx", (req, res) => {
+//   //   console.log("Aaa");
+//   //   res.status(200).send("Current yes");
+//   res.send("hello321312");
+// });
 
 app.listen(port, () => {
-	console.log("Running on http://localhost:8080/");
+	console.log("http://localhost:8080/");
 });
 function authenticate(req, res, next) {
 	if (req.session.authenticated) {

@@ -7,13 +7,13 @@ import Register from "./components/Register";
 import "./App.css";
 
 function App() {
-	const [data, setData] = useState([{}]);
-	useEffect(() => {
-		fetch("http://localhost:8080/test-connection")
-			.then((res) => res.json())
-			.then((data) => setData(data))
-			.catch((e) => console.error("eror: ", e));
-	}, []);
+	// const [data, setData] = useState([{}]);
+	// useEffect(() => {
+	// 	fetch("http://localhost:8080/test-connection")
+	// 		.then((res) => res.json())
+	// 		.then((data) => setData(data))
+	// 		.catch((e) => console.error("eror: ", e));
+	// }, []);
 	return (
 		<BrowserRouter>
 			<Routes>
