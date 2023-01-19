@@ -81,7 +81,7 @@ app.post("/register", (request, response) => {
   });
 });
 
-app.post("/login", (request, response) => {
+app.post("/loginY", (request, response) => {
   console.log(
     "logging in: ",
     request.body.username,
@@ -132,18 +132,24 @@ app.get("/test-connection", (request, response) => {
   response.setHeader("Content-Type", "application/json");
   response.send({ siema: ["eniu", "enku", "enieczku"] });
 });
+
+
+app.post("/login", (req, res) => {
+  console.log("Bbb", req.body);
+  const { username, password } = req.body;
+  res.status(200).send({
+    access: true,
+    message: `user ${username} successfully login, authorization granted <cookie>`,
+  });
+});
+// app.get("/loginx", (req, res) => {
+//   //   console.log("Aaa");
+//   //   res.status(200).send("Current yes");
+//   res.send("hello321312");
+// });
+
 app.listen(port, () => {
   console.log("Server listening on port 8080");
-});
-
-app.post("/loginx", (req, res) => {
-  console.log("Bbb", req.body);
-  res.status(200).send("some text");
-});
-app.get("/loginx", (req, res) => {
-  //   console.log("Aaa");
-  //   res.status(200).send("Current yes");
-  res.send("hello321312");
 });
 function authenticate(req, res, next) {
   if (req.session.authenticated) {

@@ -20,6 +20,8 @@ import { useForm } from "react-hook-form";
 
 import "../index.css"; //fonts
 import { Form } from "react-router-dom";
+import { render, getByLabelText } from "react";
+import { Select } from "@mui/material";
 
 function Copyright(props) {
   return (
@@ -41,6 +43,7 @@ function Copyright(props) {
 
 const Login = () => {
   const {
+    reset,
     register,
     handleSubmit,
     watch,
@@ -49,8 +52,7 @@ const Login = () => {
   // const onSubmit = (data) => console.log(data);
   // console.log(errors);
   const submitHandler = (data) => {
-    // console.log("data:", JSON.stringify(data));
-    fetch("https://fnvzol-8080.preview.csb.app/loginx", {
+    fetch("https://fnvzol-8080.preview.csb.app/login", {
       mode: "cors",
       method: "POST",
       body: JSON.stringify(data),
@@ -58,17 +60,25 @@ const Login = () => {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-      // headers: { "Content Type": "application/json" },
     })
-      .then((res) => res.status)
+      .then((res) => res.json())
       .then((response) => {
-        if (response == 200) {
-          console.log("successful login");
+        // console.log(response);
+        if (response.access) {
+          console.log(response.message);
+          reset();
+          //grant acccess to homepage
+          //route to homepage
         } else {
           console.log("Error: ", response.message);
         }
       })
-      .catch((error) => console.error("Error2: ", error));
+      .catch((error) =>
+        console.error(
+          "Failed to fetch, check if server is up and running: ",
+          error
+        )
+      );
   };
 
   const paperStyle = {
@@ -122,6 +132,7 @@ const Login = () => {
           <form onSubmit={handleSubmit(submitHandler)}>
             <TextField
               label="Username"
+              id="username"
               placeholder="Enter Username"
               style={inputStyle}
               fullWidth
@@ -137,6 +148,7 @@ const Login = () => {
             />
             <TextField
               label="Password"
+              id="password"
               placeholder="Enter Password"
               style={inputStyle}
               type="password"
