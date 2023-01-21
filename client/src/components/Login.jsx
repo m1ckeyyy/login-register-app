@@ -77,7 +77,7 @@ const Login = () => {
 					Cookies.set("access_token", res.token, {
 						expires: 7,
 						secure: true,
-						httpOnly: true,
+						// httpOnly: true,
 					});
 					console.log(Cookies.get("access_token"));
 				} else {
