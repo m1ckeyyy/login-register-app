@@ -11,148 +11,158 @@ const cors = require("cors");
 const Cookies = require("js-cookie");
 require("dotenv").config();
 const uri = process.env.MONGO_URI;
-app.use(cors());
+
+app.use(
+	cors({
+		origin: "http://127.0.0.1:5173/",
+		methods: ["GET", "POST", "PUT", "DELETE"],
+		credentials: true,
+	})
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use(
-  session({
-    secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
-    cookie: { maxAge: Infinity },
-    resave: false, // don't save the session if it wasn't modified
-    saveUninitialized: true, // don't create a session until something is stored
-  })
+	session({
+		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
+		cookie: { maxAge: Infinity },
+		resave: false, // don't save the session if it wasn't modified
+		saveUninitialized: true, // don't create a session until something is stored
+	})
 );
 mongoose.set("strictQuery", false); //supress warning
 mongoose
-  .connect(uri)
-  .then(() => console.log("Successfully connected to MongoDB"))
-  .catch((error) => console.error(error));
+	.connect(uri)
+	.then(() => console.log("Successfully connected to MongoDB"))
+	.catch((error) => console.error(error));
 
 const User = require("./User");
 
 app.post("/", (req, res) => {
-  const userCookie = req.cookies.user;
-  console.log(userCookie);
-  res.status(200).send({ message: `${userCookie}` });
+	const userCookie = req.cookies.user;
+	console.log(userCookie);
+	res.status(200).send({ message: `${userCookie}` });
 });
 
 app.post("/register", (req, res) => {
-  // DENY DUPLICATE USERNAMES
-  const { username, password } = req.body;
-  const newUser = new User({ username, password });
+	// DENY DUPLICATE USERNAMES
+	const { username, password } = req.body;
+	const newUser = new User({ username, password });
 
-  console.log("server.js,/register,newUser: ", newUser);
-  const validationError = newUser.validateSync({ username, password });
-  if (validationError) {
-    const { message } = validationError.errors.password;
-    console.log(message);
-    return res.status(400).send({ error: message });
-  }
-  newUser.save((error) => {
-    if (error) {
-      res.status(500).send("Error saving user to database");
-    } else {
-      console.log("user yes");
-      //   req.flash("success", "You are now registered and can log in");
-      res.status(200).json({ redirect: "/login" });
-    }
-  });
+	console.log("server.js,/register,newUser: ", newUser);
+	const validationError = newUser.validateSync({ username, password });
+	if (validationError) {
+		const { message } = validationError.errors.password;
+		console.log(message);
+		return res.status(400).send({ error: message });
+	}
+	newUser.save((error) => {
+		if (error) {
+			res.status(500).send("Error saving user to database");
+		} else {
+			console.log("user yes");
+			//   req.flash("success", "You are now registered and can log in");
+			res.status(200).json({ redirect: "/login" });
+		}
+	});
 });
 
 app.post("/login", (req, res) => {
-  console.log("logging in: ", req.body.username, "...");
-  try {
-    let { username, password } = req.body;
+	console.log("logging in: ", req.body.username, "...");
+	try {
+		let { username, password } = req.body;
 
-    User.findOne({ username }).then((user) => {
-      if (!user) {
-        return res.status(404).send({
-          access: false,
-          message: `user ${username} not found, authorization failed`,
-        });
-      }
+		User.findOne({ username }).then((user) => {
+			if (!user) {
+				return res.status(404).send({
+					access: false,
+					message: `user ${username} not found, authorization failed`,
+				});
+			}
 
-      bcrypt.compare(password, user.password).then((isMatching) => {
-        if (isMatching) {
-          password = user.password;
-          req.session.authenticated = true;
-          req.session.user = {
-            username,
-            password,
-          };
-          console.log(username, password);
+			bcrypt.compare(password, user.password).then((isMatching) => {
+				if (isMatching) {
+					password = user.password;
+					req.session.authenticated = true;
+					req.session.user = {
+						username,
+						password,
+					};
+					console.log(username, password);
 
-          const accessToken = jwt.sign(
-            username,
-            process.env.ACCESS_TOKEN_SECRET
-          );
-          
-          // res.json({ accessToken: accessToken });
-          res.status(200).send({
-            access: true,
-            token: accessToken,
-          });
-        } else {
-          res
-            .status(401)
-            .send({ access: false, message: "Incorrect password" });
-        }
-      });
-    });
-  } catch (err) {
-    res.status(500).send({ access: false, message: "An error occured" });
-    console.log(err);
-  }
+					const accessToken = jwt.sign(
+						username,
+						process.env.ACCESS_TOKEN_SECRET
+					);
+
+					// res.json({ accessToken: accessToken });
+					res.status(200).send({
+						access: true,
+						token: accessToken,
+					});
+				} else {
+					res
+						.status(401)
+						.send({ access: false, message: "Incorrect password" });
+				}
+			});
+		});
+	} catch (err) {
+		res.status(500).send({ access: false, message: "An error occured" });
+		console.log(err);
+	}
 });
-app.get("/authorizeUser", (req, res, next) => {
-  console.log("AUTHORIZEUSER");
-  const token = req.headers.cookie.split(" ")[1];
-  console.log(token);
+app.post("/authorizeUser", (req, res, next) => {
+	res.set("Access-Control-Allow-Origin", "http://127.0.0.1:5173/");
+	res.set("Access-Control-Allow-Credentials", "true");
 
-  console.log("Aaa: ", req.headers["authorization"]);
-  res.status(200);
-  // req.headers.cookie
-  //   .split(";")
-  //   .find((c) => c.trim().startsWith("access_token="))
-  //   .split("=")[1];
+	console.log("AUTHORIZEUSER");
+	const token = req.headers.cookie;
+	console.log(token);
 
-  // const authHeader = req.headers["authorization"];
-  // const token = authHeader && authHeader.split(" ")[1];
-  // if (token == null) return res.status(401);
+	console.log("Aaa: ", req.headers["authorization"]);
+	res.status(200).send({ message: "hey" });
+	// req.headers.cookie
+	//   .split(";")
+	//   .find((c) => c.trim().startsWith("access_token="))
+	//   .split("=")[1];
 
-  // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-  //   if (err) return res.status(403);
-  //   req.user = user;
-  //   next();
-  // });
-  // next();
+	// const authHeader = req.headers["authorization"];
+	// const token = authHeader && authHeader.split(" ")[1];
+	// if (token == null) return res.status(401);
+
+	// jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+	//   if (err) return res.status(403);
+	//   req.user = user;
+	//   next();
+	// });
+	// next();
 });
 
 app.get("/logout", (req, res) => {
-  req.session.destroy(function (err) {
-    if (err) {
-      console.log("logout error", err);
-    } else {
-      res.clearCookie("connect.sid");
-      res.redirect("/login");
-    }
-  });
+	req.session.destroy(function (err) {
+		if (err) {
+			console.log("logout error", err);
+		} else {
+			res.clearCookie("connect.sid");
+			res.redirect("/login");
+		}
+	});
 });
 function authenticate(req, res, next) {
-  if (req.session.authenticated) {
-    console.log("AUTHENTICATed");
-    next();
-  } else {
-    console.log("NOT AUTHenticated");
-    res.redirect("/login");
-  }
+	if (req.session.authenticated) {
+		console.log("AUTHENTICATed");
+		next();
+	} else {
+		console.log("NOT AUTHenticated");
+		res.redirect("/login");
+	}
 }
 function notAuthenticated(req, res, next) {
-  if (!req.session.authenticated) {
-    next();
-  } else {
-    res.redirect("/");
-  }
+	if (!req.session.authenticated) {
+		next();
+	} else {
+		res.redirect("/");
+	}
 }
 // function authenticateToken(req, res, next) {
 //   const authHeader = req.headers["authorization"];
@@ -166,5 +176,5 @@ function notAuthenticated(req, res, next) {
 //   });
 // }
 app.listen(port, () => {
-  console.log("Running on http://localhost:8080/");
+	console.log("Running on http://localhost:8080/");
 });
