@@ -59,7 +59,7 @@ const Login = () => {
 	const submitHandler = (data) => {
 		data.rememberMe = rememberMe;
 		reset();
-		fetch("https://fnvzol-8080.preview.csb.app/login", {
+		fetch("http://localhost:8080/login", {
 			mode: "cors",
 			credentials: "include",
 			method: "POST",
@@ -79,6 +79,8 @@ const Login = () => {
 						secure: true,
 						// httpOnly: true,
 					});
+					// window.location.replace("/");
+
 					console.log(Cookies.get("access_token"));
 				} else {
 					console.log("(Loggin.jsx) ERROR: ", res.message);
