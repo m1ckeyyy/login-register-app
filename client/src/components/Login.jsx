@@ -60,12 +60,12 @@ const Login = () => {
     data.rememberMe = rememberMe;
     reset();
     fetch("https://fnvzol-8080.preview.csb.app/login", {
-      mode: "no-cors",
+      mode: "cors",
+      credentials: "include",
       method: "POST",
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
       },
     })
       .then((res) => res.json())
@@ -75,15 +75,13 @@ const Login = () => {
           console.log(res.token);
           Cookies.remove("access_token");
           Cookies.set("access_token", res.token, {
-            expires: 700000,
+            expires: 7,
             secure: true,
-            // httpOnly: true,
+            httpOnly: true,
           });
-          // Cookies.set("name", "value");
           console.log(Cookies.get("access_token"));
-          //set cookie
         } else {
-          console.log("Error: ", res.message);
+          console.log("(Loggin.jsx) ERROR: ", res.message);
         }
       })
       .catch((error) =>
