@@ -3,33 +3,24 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import Register from "./components/Register";
+import Cookies from "js-cookie";
 
 import "./App.css";
 
 function App() {
 	// const [data, setData] = useState([{}]);
-	// useEffect(() => {
-	// 	fetch("http://localhost:8080/test-connection")
-	// 		.then((res) => res.json())
-	// 		.then((data) => setData(data))
-	// 		.catch((e) => console.error("eror: ", e));
-	// }, []);
 
-	// const headers = {
-	//   credentials: "include",
-	// };
-
-	fetch("http://127.0.0.1:8080/authorizeUser", {
-		method: "POST",
-		mode: "no-cors",
+	fetch("https://fnvzol-8080.preview.csb.app/auth", {
+		method: "GET",
+		mode: "cors",
 		credentials: "include",
 		headers: {
-			"Content-Type": "Authorization",
+			Authorization: `Bearer ${Cookies.get("access_token")}`,
 		},
 	})
-		.then((res) => res)
+		.then((res) => res.json())
 		.then((data) => {
-			console.log(data);
+			console.log("authorizeUser receive from fetch data: ", data);
 		})
 		.catch((error) => {
 			console.error(
@@ -37,8 +28,6 @@ function App() {
 				error
 			);
 		});
-
-	//   console.log("This is from App.jsx");
 
 	//fetch localhost8080/authUser (server) and get isUserAuthenticated from JWT
 	//if has token Route path='/' element {<Home/>}

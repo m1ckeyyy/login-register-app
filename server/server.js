@@ -11,10 +11,9 @@ const cors = require("cors");
 const Cookies = require("js-cookie");
 require("dotenv").config();
 const uri = process.env.MONGO_URI;
-
 app.use(
 	cors({
-		origin: "http://127.0.0.1:5173/",
+		origin: "https://fnvzol-5173.preview.csb.app",
 		methods: ["GET", "POST", "PUT", "DELETE"],
 		credentials: true,
 	})
@@ -66,7 +65,11 @@ app.post("/register", (req, res) => {
 	});
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", setCORS, (req, res) => {
+	res.set("Access-Control-Allow-Origin", "https://fnvzol-5173.preview.csb.app");
+	res.setHeader("Access-Control-Allow-Credentials", true);
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
 	console.log("logging in: ", req.body.username, "...");
 	try {
 		let { username, password } = req.body;
@@ -100,6 +103,7 @@ app.post("/login", (req, res) => {
 						token: accessToken,
 					});
 				} else {
+					console.log("notMAtching");
 					res
 						.status(401)
 						.send({ access: false, message: "Incorrect password" });
@@ -111,31 +115,24 @@ app.post("/login", (req, res) => {
 		console.log(err);
 	}
 });
-app.post("/authorizeUser", (req, res, next) => {
-	res.set("Access-Control-Allow-Origin", "http://127.0.0.1:5173/");
-	res.set("Access-Control-Allow-Credentials", "true");
 
-	console.log("AUTHORIZEUSER");
-	const token = req.headers.cookie;
-	console.log(token);
+app.get("/auth", setCORS, (req, res, next) => {
+	const authHeader = req.headers["authorization"];
+	const token = authHeader && authHeader.split(" ")[1];
+	if (token == null) return res.status(401);
 
-	console.log("Aaa: ", req.headers["authorization"]);
-	res.status(200).send({ message: "hey" });
-	// req.headers.cookie
-	//   .split(";")
-	//   .find((c) => c.trim().startsWith("access_token="))
-	//   .split("=")[1];
-
-	// const authHeader = req.headers["authorization"];
-	// const token = authHeader && authHeader.split(" ")[1];
-	// if (token == null) return res.status(401);
-
-	// jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-	//   if (err) return res.status(403);
-	//   req.user = user;
-	//   next();
-	// });
-	// next();
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+		if (err) {
+			console.log("jwt verifcation ERROR");
+			return res.status(403);
+		}
+		console.log("user verified with JWT");
+		req.user = user;
+		console.log(user);
+		return res.status(200).send({
+			message: `${user} was verified with JWT, grant access to homepage`,
+		});
+	});
 });
 
 app.get("/logout", (req, res) => {
@@ -148,33 +145,23 @@ app.get("/logout", (req, res) => {
 		}
 	});
 });
-function authenticate(req, res, next) {
-	if (req.session.authenticated) {
-		console.log("AUTHENTICATed");
-		next();
-	} else {
-		console.log("NOT AUTHenticated");
-		res.redirect("/login");
-	}
+function setCORS(req, res, next) {
+	res.set("Access-Control-Allow-Origin", "https://fnvzol-5173.preview.csb.app");
+	res.setHeader("Access-Control-Allow-Credentials", true);
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+	next();
 }
-function notAuthenticated(req, res, next) {
-	if (!req.session.authenticated) {
-		next();
-	} else {
-		res.redirect("/");
-	}
-}
-// function authenticateToken(req, res, next) {
-//   const authHeader = req.headers["authorization"];
-//   const token = authHeader && authHeader.split(" ")[1];
-//   if (token == null) return res.status(401);
+function authenticateToken(req, res, next) {
+	const token = req.headers && req.headers.cookie.split(" ")[1];
+	if (token == null) return res.status(401);
 
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//     if (err) return res.status(403);
-//     req.user = user;
-//     next();
-//   });
-// }
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+		if (err) return res.status(403);
+		console.log("user verified with JWT");
+		req.user = user;
+		next();
+	});
+}
 app.listen(port, () => {
 	console.log("Running on http://localhost:8080/");
 });
