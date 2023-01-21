@@ -119,11 +119,12 @@ app.post("/login", setCORS, (req, res) => {
 app.get("/auth", setCORS, (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.status(401);
-
+  if (token == "undefined") {
+    return res.status(401).send({ message: "token is not defined" });
+  }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
-      console.log("jwt verifcation ERROR");
+      console.log("token; ", token, "jwt verifcation ERROR: ");
       return res.status(403);
     }
     console.log("user verified with JWT");
@@ -133,6 +134,7 @@ app.get("/auth", setCORS, (req, res, next) => {
       message: `${user} was verified with JWT, grant access to homepage`,
     });
   });
+  // res.status(200).send({ message: "two hundReeed" });
 });
 
 app.get("/logout", (req, res) => {
@@ -149,6 +151,7 @@ function setCORS(req, res, next) {
   res.set("Access-Control-Allow-Origin", "https://fnvzol-5173.preview.csb.app");
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization");
   next();
 }
 function authenticateToken(req, res, next) {
