@@ -1,167 +1,162 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const session = require("express-session");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { response } = require("express");
-const cookieParser = require("cookie-parser");
+const express = require('express');
+const mongoose = require('mongoose');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { response } = require('express');
+const cookieParser = require('cookie-parser');
 const app = express();
 const port = process.env.PORT || 8080;
-const cors = require("cors");
-const Cookies = require("js-cookie");
-require("dotenv").config();
+const cors = require('cors');
+const Cookies = require('js-cookie');
+require('dotenv').config();
 const uri = process.env.MONGO_URI;
 app.use(
-	cors({
-		origin: "http://localhost:5173",
-		methods: ["GET", "POST", "PUT", "DELETE"],
-		credentials: true,
-	})
+  cors({
+    origin: 'https://fnvzol-5174.preview.csb.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
 );
 app.use((req, res, next) => {
-	res.set("Access-Control-Allow-Origin", "http://localhost:5173");
-	res.setHeader("Access-Control-Allow-Credentials", true);
-	res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-	res.setHeader("Access-Control-Allow-Headers", "Authorization");
-	next();
+  res.set('Access-Control-Allow-Origin', 'https://fnvzol-5174.preview.csb.app');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization');
+  next();
 });
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(
-	session({
-		secret: "my-sgfrdesgfr6grdterdgrtegerggre432ecret", // a secret key to sign the session ID cookie
-		cookie: { maxAge: Infinity },
-		resave: false, // don't save the session if it wasn't modified
-		saveUninitialized: true, // don't create a session until something is stored
-	})
+  session({
+    secret: 'my-sgfrdesgfr6grdterdgrtegerggre432ecret', // a secret key to sign the session ID cookie
+    cookie: { maxAge: Infinity },
+    resave: false, // don't save the session if it wasn't modified
+    saveUninitialized: true, // don't create a session until something is stored
+  })
 );
-mongoose.set("strictQuery", false); //supress warning
+mongoose.set('strictQuery', false); //supress warning
 mongoose
-	.connect(uri)
-	.then(() => console.log("Successfully connected to MongoDB"))
-	.catch((error) => console.error(error));
+  .connect(uri)
+  .then(() => console.log('Successfully connected to MongoDB'))
+  .catch((error) => console.error(error));
 
-const User = require("./User");
+const User = require('./User');
 
-app.post("/", (req, res) => {
-	const userCookie = req.cookies.user;
-	console.log(userCookie);
-	res.status(200).send({ message: `${userCookie}` });
+app.post('/', (req, res) => {
+  const userCookie = req.cookies.user;
+  console.log(userCookie);
+  res.status(200).send({ message: `${userCookie}` });
 });
 
-app.post("/register", (req, res) => {
-	// DENY DUPLICATE USERNAMES
-	const { username, password } = req.body;
-	const newUser = new User({ username, password });
+app.post('/register', (req, res) => {
+  // DENY DUPLICATE USERNAMES
+  const { username, password } = req.body;
+  const newUser = new User({ username, password });
 
-	console.log("server.js,/register,newUser: ", newUser);
-	const validationError = newUser.validateSync({ username, password });
-	if (validationError) {
-		const { message } = validationError.errors.password;
-		console.log(message);
-		return res.status(400).send({ error: message });
-	}
-	newUser.save((error) => {
-		if (error) {
-			res.status(500).send("Error saving user to database");
-		} else {
-			console.log("user yes");
-			//   req.flash("success", "You are now registered and can log in");
-			res.status(200).json({ redirect: "/login" });
-		}
-	});
+  console.log('server.js,/register,newUser: ', newUser);
+  const validationError = newUser.validateSync({ username, password });
+  if (validationError) {
+    const { message } = validationError.errors.password;
+    console.log(message);
+    return res.status(400).send({ error: message });
+  }
+  newUser.save((error) => {
+    if (error) {
+      res.status(500).send('Error saving user to database');
+    } else {
+      console.log('user yes');
+      //   req.flash("success", "You are now registered and can log in");
+      res.status(200).json({ redirect: '/login' });
+    }
+  });
 });
 
-app.post("/login", (req, res) => {
-	console.log("logging in: ", req.body.username, "...");
-	try {
-		let { username, password } = req.body;
+app.post('/login', (req, res) => {
+  console.log('logging in: ', req.body.username, '...');
+  try {
+    let { username, password } = req.body;
 
-		User.findOne({ username }).then((user) => {
-			if (!user) {
-				return res.status(404).send({
-					access: false,
-					message: `user ${username} not found, authorization failed`,
-				});
-			}
+    User.findOne({ username }).then((user) => {
+      if (!user) {
+        return res.status(404).send({
+          access: false,
+          message: `user ${username} not found, authorization failed`,
+        });
+      }
 
-			bcrypt.compare(password, user.password).then((isMatching) => {
-				if (isMatching) {
-					password = user.password;
-					req.session.authenticated = true;
-					req.session.user = {
-						username,
-						password,
-					};
-					console.log(username, password);
+      bcrypt.compare(password, user.password).then((isMatching) => {
+        if (isMatching) {
+          password = user.password;
+          req.session.authenticated = true;
+          req.session.user = {
+            username,
+            password,
+          };
+          console.log(username, password);
 
-					const accessToken = jwt.sign(
-						username,
-						process.env.ACCESS_TOKEN_SECRET
-					);
+          const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
 
-					// res.json({ accessToken: accessToken });
-					res.status(200).send({
-						access: true,
-						token: accessToken,
-					});
-				} else {
-					console.log("notMAtching");
-					res
-						.status(401)
-						.send({ access: false, message: "Incorrect password" });
-				}
-			});
-		});
-	} catch (err) {
-		res.status(500).send({ access: false, message: "An error occured" });
-		console.log(err);
-	}
+          // res.json({ accessToken: accessToken });
+          res.status(200).send({
+            access: true,
+            token: accessToken,
+          });
+        } else {
+          console.log('notMAtching');
+          res.status(401).send({ access: false, message: 'Incorrect password' });
+        }
+      });
+    });
+  } catch (err) {
+    res.status(500).send({ access: false, message: 'An error occured' });
+    console.log(err);
+  }
 });
 
-app.get("/auth", (req, res, next) => {
-	const authHeader = req.headers["authorization"];
-	const token = authHeader && authHeader.split(" ")[1];
-	if (token == "undefined") {
-		return res.status(401).send({ message: "token is not defined" });
-	}
-	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-		if (err) {
-			console.log("token; ", token, "jwt verifcation ERROR: ");
-			return res.status(403);
-		}
-		console.log("user verified with JWT");
-		req.user = user;
-		console.log(user);
-		return res.status(200).send({
-			message: `${user} was verified with JWT, grant access to homepage`,
-			user: user,
-		});
-	});
+app.get('/auth', (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == 'undefined') {
+    return res.status(401).send({ message: 'token is not defined' });
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      console.log('token; ', token, 'jwt verifcation ERROR: ');
+      return res.status(403);
+    }
+    console.log('user verified with JWT');
+    req.user = user;
+    console.log(user);
+    return res.status(200).send({
+      message: `${user} was verified with JWT, grant access to homepage`,
+      user: user,
+    });
+  });
 });
 
-app.get("/logout", (req, res) => {
-	req.session.destroy(function (err) {
-		if (err) {
-			console.log("logout error", err);
-		} else {
-			res.clearCookie("connect.sid");
-			res.redirect("/login");
-		}
-	});
+app.get('/logout', (req, res) => {
+  req.session.destroy(function (err) {
+    if (err) {
+      console.log('logout error', err);
+    } else {
+      res.clearCookie('connect.sid');
+      res.redirect('/login');
+    }
+  });
 });
 function authenticateToken(req, res, next) {
-	const token = req.headers && req.headers.cookie.split(" ")[1];
-	if (token == null) return res.status(401);
+  const token = req.headers && req.headers.cookie.split(' ')[1];
+  if (token == null) return res.status(401);
 
-	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-		if (err) return res.status(403);
-		console.log("user verified with JWT");
-		req.user = user;
-		next();
-	});
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403);
+    console.log('user verified with JWT');
+    req.user = user;
+    next();
+  });
 }
 app.listen(port, () => {
-	console.log("Running on http://localhost:8080/");
+  console.log('Running on http://localhost:8080/');
 });

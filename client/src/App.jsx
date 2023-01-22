@@ -1,95 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Home from './components/Home';
 import Register from './components/Register';
 import LoadingScreen from './components/LoadingScreen';
-import Cookies from 'js-cookie';
-
+import { useAuth } from './useAuth';
 import './App.css';
 
-function App() {
-  const [authenticated, setAuthentication] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('http://localhost:8080/auth', {
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        Authorization: `Bearer ${Cookies.get('access_token')}`,
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-        throw new Error('Unauthorized');
-      })
-      .then((res) => {
-        setAuthentication(res.user);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        setAuthentication(false);
-        setIsLoading(false);
-        console.error(error);
-      });
-  }, []);
+function useComponentBasedOnPath() {
+  const { authenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (authenticated) {
-      console.log('authenticated: ', authenticated);
+      navigate('/');
     } else {
-      console.log('else authenticated: ', authenticated);
+      navigate('/login');
     }
   }, [authenticated]);
 
-  // fetch("http://localhost:8080/auth", {
-  // 	method: "GET",
-  // 	mode: "cors",
-  // 	headers: {
-  // 		Authorization: `Bearer ${Cookies.get("access_token")}`,
-  // 	},
-  // })
-  // 	.then((res) => {
-  // 		if (res.ok) {
-  // 			res = res.json();
-  // 			return res;
-  // 		}
-  // 		throw new Error("Unauthorized");
-  // 	})
-  // 	.then((res) => {
-  // 		console.log(res);
-  // 		setData(res.user);
-  // 	})
-  // 	.catch((error) => {
-  // 		setData(false);
-  // 		console.error(error);
-  // 	});
+  const [component, setComponent] = useState(null);
+  const location = useLocation();
 
-  //fetch localhost8080/authUser (server) and get isUserAuthenticated from JWT
-  //if has token Route path='/' element {<Home/>}
-  //if no token Route path='/' element {<Login/>}
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setComponent(<Home />);
+    } else if (location.pathname === '/login') {
+      setComponent(<Login />);
+    }
+  }, [location]);
+
+  return [component, isLoading];
+}
+
+function App() {
+  const [component, isLoading] = useComponentBasedOnPath();
+
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={authenticated ? <Home /> : <Login />} />
-        <Route path="/login" element={authenticated ? <Home /> : <Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </BrowserRouter>
-    // <div className="main">
-    //   {typeof data.siema === "undefined" ? (
-    //     <p>Loading....</p>
-    //   ) : (
-    //     data.siema.map((eniek, i) => <p key={i}>{eniek}</p>)
-    //   )}
-    // </div>
+    <Routes>
+      <Route path="/login" element={component} />
+      <Route path="/" element={component} />
+    </Routes>
   );
+
+  // <div className="main">
+  //   {typeof data.siema === "undefined" ? (
+  //     <p>Loading....</p>
+  //   ) : (
+  //     data.siema.map((eniek, i) => <p key={i}>{eniek}</p>)
+  //   )}
+  // </div>
 }
 export default App;

@@ -1,0 +1,11 @@
+check authentication
+if authenticated = route to '/'
+now location.pathname changed so get setComponent(component) based on location.pathname
+tools: authenticated, isLoading, component
+TEST 1. user logs in an gets redirected to '/' && <Home/>
+TEST 2. user is on '/' && <Home/> and tries to access '/login' => user redirected back to '/' && <Home/>
+TEST 3. unauthorized user tries to access '/' from '/login' => user redirected back to '/login' && <Login/>
+
+
+pomysl:
+zajac sie samymi redirectami url i na koncu dac, return component (ktory bazuje na url)

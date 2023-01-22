@@ -1,6 +1,28 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+/* @import './../tailwind.config.cjs'; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body,
 html {
   margin: 0;
   padding: 0;
+}
+body {
+  /* color: red; */
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animation-rotate {
+  animation: rotate 1.2s linear infinite;
 }
