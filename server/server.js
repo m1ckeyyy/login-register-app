@@ -13,18 +13,18 @@ require('dotenv').config();
 const uri = process.env.MONGO_URI;
 app.use(
   cors({
-    origin: 'https://fnvzol-5174.preview.csb.app',
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
 );
-app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', 'https://fnvzol-5174.preview.csb.app');
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Headers', 'Authorization');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+//   res.setHeader('Access-Control-Allow-Credentials', true);
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
+//   next();
+// });
 
 app.use(cookieParser());
 app.use(express.json());
@@ -102,6 +102,7 @@ app.post('/login', (req, res) => {
           res.status(200).send({
             access: true,
             token: accessToken,
+            username: username,
           });
         } else {
           console.log('notMAtching');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 // import CssBaseline from '@mui/material/CssBaseline';
@@ -18,11 +18,12 @@ import LoginIcon from '@mui/icons-material/Login';
 // import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
-
+import { useSignIn } from 'react-auth-kit';
 import '../index.css'; //fonts
 import { Form, useNavigate } from 'react-router-dom';
 // import { render, getByLabelText } from 'react';
 // import { Select } from '@mui/material';
+import { useIsAuthenticated } from 'react-auth-kit';
 
 function Copyright(props) {
   return (
@@ -39,6 +40,20 @@ function Copyright(props) {
 
 const Login = () => {
   const navigate = useNavigate();
+  const isAuthenticated = useIsAuthenticated()();
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+      return;
+    }
+  }, [isAuthenticated]);
+  if (isAuthenticated) return;
+  // if (isAuthenticated) {
+  //   navigate('/');
+  //   return;
+  // }
+  //react-auth-kit
+  const signIn = useSignIn();
   const [rememberMe, setRememberMe] = useState(false);
   const handleCheckbox = (e) => {
     setRememberMe(e.target.checked);
@@ -52,10 +67,10 @@ const Login = () => {
   } = useForm();
   // const onSubmit = (data) => console.log(data);
   // console.log(errors);
-  const submitHandler = (data) => {
+  const submitHandler = async (data) => {
     data.rememberMe = rememberMe;
     reset();
-    fetch('https://fnvzol-8080.preview.csb.app/login', {
+    fetch('http://localhost:8080/login', {
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),
@@ -65,19 +80,21 @@ const Login = () => {
     })
       .then((res) => res.json())
       .then((res) => {
+        //
+        signIn({ token: res.token, expiresIn: 3600, tokenType: 'Bearer', authState: { username: res.username } });
         console.log(res);
         if (res.access) {
           console.log(res.token);
-          Cookies.remove('access_token');
-          Cookies.set('access_token', res.token, {
-            expires: 7,
-            secure: true,
-            // httpOnly: true,
-          });
+          // Cookies.remove('access_token');
+          // Cookies.set('access_token', res.token, {
+          //   expires: 7,
+          //   secure: true,
+          //   // httpOnly: true,
+          // });
           console.log("NAVIGATE TO '/'");
           navigate('/');
 
-          console.log(Cookies.get('access_token'));
+          // console.log(Cookies.get('access_token'));
         } else {
           console.log('(Loggin.jsx) ERROR: ', res.message);
         }
