@@ -20,7 +20,8 @@ import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 
 import '../index.css'; //fonts
-import { Form, useNavigate } from 'react-router-dom';
+import { Form, useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from './../useAuth.jsx';
 // import { render, getByLabelText } from 'react';
 // import { Select } from '@mui/material';
 
@@ -37,7 +38,9 @@ function Copyright(props) {
   );
 }
 
-const Login = () => {
+const Login = ({ setAuthentication }) => {
+  // const { setAuthentication } = useAuth();
+
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
   const handleCheckbox = (e) => {
@@ -52,7 +55,7 @@ const Login = () => {
   } = useForm();
   // const onSubmit = (data) => console.log(data);
   // console.log(errors);
-  const submitHandler = (data) => {
+  const submitHandler = async (data) => {
     data.rememberMe = rememberMe;
     reset();
     fetch('https://fnvzol-8080.preview.csb.app/login', {
@@ -74,10 +77,14 @@ const Login = () => {
             secure: true,
             // httpOnly: true,
           });
-          console.log("NAVIGATE TO '/'");
-          navigate('/');
+          setAuthentication(true);
+          // console.log(authenticated);
 
-          console.log(Cookies.get('access_token'));
+          // navigate('/');
+          // location.pathname === '/';
+          // return <Navigate to="/" />;
+
+          console.log('Login SET, Token: ', Cookies.get('access_token'));
         } else {
           console.log('(Loggin.jsx) ERROR: ', res.message);
         }

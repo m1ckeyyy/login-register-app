@@ -7,34 +7,38 @@ import LoadingScreen from './components/LoadingScreen';
 import { useAuth } from './useAuth';
 import './App.css';
 
-function useComponentBasedOnPath() {
-  const { authenticated, isLoading } = useAuth();
-  const navigate = useNavigate();
+// function useComponentBasedOnPath() {
+//   const { authenticated, isLoading } = useAuth();
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   return [authenticated, isLoading];
 
-  // useEffect(() => {
-  //   if (authenticated) {
-  //     navigate('/');
-  //   } else {
-  //     navigate('/login');
-  //   }
-  // }, [authenticated]);
+//   // useEffect(() => {
+//   //   if (authenticated) {
+//   //     navigate('/');
+//   //   } else {
+//   //     navigate('/login');
+//   //   }
+//   // }, [authenticated]);
 
-  // const [component, setComponent] = useState(null);
-  const location = useLocation();
+//   // const [component, setComponent] = useState(null);
 
-  // useEffect(() => {
-  //   if (location.pathname === '/') {
-  //     setComponent(<Home />);
-  //   } else if (location.pathname === '/login') {
-  //     setComponent(<Login />);
-  //   }
-  // }, [location]);
-
-  return [authenticated, isLoading];
-}
+//   // useEffect(() => {
+//   //   if (location.pathname === '/') {
+//   //     setComponent(<Home />);
+//   //   } else if (location.pathname === '/login') {
+//   //     setComponent(<Login />);
+//   //   }
+//   // }, [location]);
+// }
 
 function App() {
-  const [authenticated, isLoading] = useComponentBasedOnPath();
+  // const [authenticated, isLoading] = useComponentBasedOnPath();
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { authenticated, isLoading, setAuthentication } = useAuth();
+  console.log('render App.jsx, auth: ', authenticated);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -42,7 +46,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={authenticated ? <Navigate to="/" /> : <Login />} />
+      <Route path="/login" element={authenticated ? <Navigate to="/" /> : <Login setAuthentication={setAuthentication} />} />
       <Route path="/" element={authenticated ? <Home /> : <Navigate to="/login" />} />
     </Routes>
   );
