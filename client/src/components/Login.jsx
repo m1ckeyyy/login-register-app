@@ -20,7 +20,8 @@ import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 import { useSignIn } from 'react-auth-kit';
 import '../index.css'; //fonts
-import { Form, useNavigate } from 'react-router-dom';
+import { Form, useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from './../useAuth.jsx';
 // import { render, getByLabelText } from 'react';
 // import { Select } from '@mui/material';
 import { useIsAuthenticated } from 'react-auth-kit';
@@ -38,7 +39,9 @@ function Copyright(props) {
   );
 }
 
-const Login = () => {
+const Login = ({ setAuthentication }) => {
+  // const { setAuthentication } = useAuth();
+
   const navigate = useNavigate();
   const isAuthenticated = useIsAuthenticated()();
   useEffect(() => {
@@ -85,16 +88,20 @@ const Login = () => {
         console.log(res);
         if (res.access) {
           console.log(res.token);
-          // Cookies.remove('access_token');
-          // Cookies.set('access_token', res.token, {
-          //   expires: 7,
-          //   secure: true,
-          //   // httpOnly: true,
-          // });
-          console.log("NAVIGATE TO '/'");
-          navigate('/');
+          Cookies.remove('access_token');
+          Cookies.set('access_token', res.token, {
+            expires: 7,
+            secure: true,
+            // httpOnly: true,
+          });
+          setAuthentication(true);
+          // console.log(authenticated);
 
-          // console.log(Cookies.get('access_token'));
+          // navigate('/');
+          // location.pathname === '/';
+          // return <Navigate to="/" />;
+
+          console.log('Login SET, Token: ', Cookies.get('access_token'));
         } else {
           console.log('(Loggin.jsx) ERROR: ', res.message);
         }
