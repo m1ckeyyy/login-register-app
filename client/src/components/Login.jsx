@@ -18,13 +18,11 @@ import LoginIcon from '@mui/icons-material/Login';
 // import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
-import { useSignIn } from 'react-auth-kit';
 import '../index.css'; //fonts
 import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
 // import { render, getByLabelText } from 'react';
 // import { Select } from '@mui/material';
-import { useIsAuthenticated } from 'react-auth-kit';
 
 function Copyright(props) {
   return (
@@ -40,23 +38,7 @@ function Copyright(props) {
 }
 
 const Login = ({ setAuthentication }) => {
-  // const { setAuthentication } = useAuth();
-
   const navigate = useNavigate();
-  const isAuthenticated = useIsAuthenticated()();
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
-      return;
-    }
-  }, [isAuthenticated]);
-  if (isAuthenticated) return;
-  // if (isAuthenticated) {
-  //   navigate('/');
-  //   return;
-  // }
-  //react-auth-kit
-  const signIn = useSignIn();
   const [rememberMe, setRememberMe] = useState(false);
   const handleCheckbox = (e) => {
     setRememberMe(e.target.checked);
@@ -69,7 +51,6 @@ const Login = ({ setAuthentication }) => {
     formState: { errors },
   } = useForm();
   // const onSubmit = (data) => console.log(data);
-  // console.log(errors);
   const submitHandler = async (data) => {
     data.rememberMe = rememberMe;
     reset();
@@ -84,7 +65,7 @@ const Login = ({ setAuthentication }) => {
       .then((res) => res.json())
       .then((res) => {
         //
-        signIn({ token: res.token, expiresIn: 3600, tokenType: 'Bearer', authState: { username: res.username } });
+        // signIn({ token: res.token, expiresIn: 3600, tokenType: 'Bearer', authState: { username: res.username } });
         console.log(res);
         if (res.access) {
           console.log(res.token);
@@ -95,12 +76,6 @@ const Login = ({ setAuthentication }) => {
             // httpOnly: true,
           });
           setAuthentication(true);
-          // console.log(authenticated);
-
-          // navigate('/');
-          // location.pathname === '/';
-          // return <Navigate to="/" />;
-
           console.log('Login SET, Token: ', Cookies.get('access_token'));
         } else {
           console.log('(Loggin.jsx) ERROR: ', res.message);
@@ -197,10 +172,7 @@ const Login = ({ setAuthentication }) => {
             </Link>
           </Typography>
           <Typography variant="h2">
-            Don't have an account?{' '}
-            <Link href="#" target="_blank">
-              Sign Up
-            </Link>
+            Don't have an account? <Link href="/register">Sign Up</Link>
           </Typography>
         </Paper>
         <Copyright sx={{ mt: 3, position: 'absolute' }} />

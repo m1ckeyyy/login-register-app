@@ -4,36 +4,10 @@ import Login from './components/Login';
 import Home from './components/Home';
 import Register from './components/Register';
 import LoadingScreen from './components/LoadingScreen';
+import { useAuth } from './useAuth.jsx';
 import './App.css';
 
-// function useComponentBasedOnPath() {
-//   const { authenticated, isLoading } = useAuth();
-//   const navigate = useNavigate();
-//   const location = useLocation();
-//   return [authenticated, isLoading];
-
-//   // useEffect(() => {
-//   //   if (authenticated) {
-//   //     navigate('/');
-//   //   } else {
-//   //     navigate('/login');
-//   //   }
-//   // }, [authenticated]);
-
-//   // const [component, setComponent] = useState(null);
-
-//   // useEffect(() => {
-//   //   if (location.pathname === '/') {
-//   //     setComponent(<Home />);
-//   //   } else if (location.pathname === '/login') {
-//   //     setComponent(<Login />);
-//   //   }
-//   // }, [location]);
-// }
-
 function App() {
-  // const [authenticated, isLoading] = useComponentBasedOnPath();
-
   const navigate = useNavigate();
   const location = useLocation();
   const { authenticated, isLoading, setAuthentication } = useAuth();
@@ -46,6 +20,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={authenticated ? <Navigate to="/" /> : <Login setAuthentication={setAuthentication} />} />
+      <Route path="/register" element={authenticated ? <Navigate to="/" /> : <Register setAuthentication={setAuthentication} />} />
       <Route path="/" element={authenticated ? <Home /> : <Navigate to="/login" />} />
     </Routes>
   );
