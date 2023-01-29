@@ -13,13 +13,13 @@ require('dotenv').config();
 const uri = process.env.MONGO_URI;
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://qhc5nx-5173.preview.csb.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
 );
 app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.set('Access-Control-Allow-Origin', 'https://qhc5nx-5173.preview.csb.app');
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
@@ -52,18 +52,19 @@ app.post('/', (req, res) => {
 
 app.post('/register', (req, res) => {
   // DENY DUPLICATE USERNAMES
-  const { username, password } = req.body;
-  const newUser = new User({ username, password });
+  const { email, firstName, lastName, password } = req.body;
+  const newUser = new User({ firstName, lastName, email, password });
 
   console.log('server.js,/register,newUser: ', newUser);
-  const validationError = newUser.validateSync({ username, password });
+  const validationError = newUser.validateSync({ email, password });
   if (validationError) {
-    const { message } = validationError.errors.password;
+    const { message } = validationError.errors.password || validationError.errors.email;
     console.log(message);
     return res.status(400).send({ error: message });
   }
   newUser.save((error) => {
     if (error) {
+      console.log(error);
       res.status(500).send('Error saving user to database');
     } else {
       console.log('user yes');
@@ -74,15 +75,15 @@ app.post('/register', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  console.log('logging in: ', req.body.username, '...');
   try {
-    let { username, password } = req.body;
+    let { email, firstName, lastName, password } = req.body;
+    console.log('logging in: ', email, firstName, lastName, '...');
 
-    User.findOne({ username }).then((user) => {
+    User.findOne({ email }).then((user) => {
       if (!user) {
         return res.status(404).send({
           access: false,
-          message: `user ${username} not found, authorization failed`,
+          message: `user ${email} not found, authorization failed`,
         });
       }
 
@@ -91,18 +92,18 @@ app.post('/login', (req, res) => {
           password = user.password;
           req.session.authenticated = true;
           req.session.user = {
-            username,
+            email,
             password,
           };
-          console.log(username, password);
-
-          const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
-
+          console.log(email, password, firstName, lastName);
+          const payload = { email, firstName, lastName, password };
+          const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
+          console.log(payload);
           // res.json({ accessToken: accessToken });
           res.status(200).send({
             access: true,
             token: accessToken,
-            username: username,
+            email: email,
           });
         } else {
           console.log('notMAtching');
@@ -128,8 +129,10 @@ app.get('/auth', (req, res, next) => {
       return res.status(403);
     }
     console.log('user verified with JWT');
+    console.log('user::,', user);
     req.user = user;
-    console.log(user);
+    // const firstNamed = user.firstName;
+    // console.log(firstNamed);
     return res.status(200).send({
       message: `${user} was verified with JWT, grant access to homepage`,
       user: user,

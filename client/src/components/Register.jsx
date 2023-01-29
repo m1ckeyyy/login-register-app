@@ -36,10 +36,6 @@ function Copyright(props) {
 
 const Register = ({ setAuthentication }) => {
   const navigate = useNavigate();
-  const [rememberMe, setRememberMe] = useState(false);
-  const handleCheckbox = (e) => {
-    setRememberMe(e.target.checked);
-  };
   const {
     reset,
     register,
@@ -48,9 +44,8 @@ const Register = ({ setAuthentication }) => {
     formState: { errors },
   } = useForm();
   const submitHandler = async (data) => {
-    data.rememberMe = rememberMe;
-    reset();
-    fetch('http://localhost:8080/register', {
+    console.log(data);
+    fetch('https://qhc5nx-8080.preview.csb.app/register', {
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),
@@ -58,30 +53,12 @@ const Register = ({ setAuthentication }) => {
         'Content-Type': 'application/json',
       },
     })
-      .then((res) => res.json())
       .then((res) => {
-        //
-        signIn({ token: res.token, expiresIn: 3600, tokenType: 'Bearer', authState: { username: res.username } });
+        if (res.ok) reset();
+        return res.json();
+      })
+      .then((res) => {
         console.log(res);
-        if (res.access) {
-          console.log(res.token);
-          Cookies.remove('access_token');
-          Cookies.set('access_token', res.token, {
-            expires: 7,
-            secure: true,
-            // httpOnly: true,
-          });
-          setAuthentication(true);
-          // console.log(authenticated);
-
-          // navigate('/');
-          // location.pathname === '/';
-          // return <Navigate to="/" />;
-
-          console.log('Register SET, Token: ', Cookies.get('access_token'));
-        } else {
-          console.log('(Loggin.jsx) ERROR: ', res.message);
-        }
       })
       .catch((error) => console.error('Failed to fetch, check if server is up and running: ', error));
   };
@@ -89,7 +66,7 @@ const Register = ({ setAuthentication }) => {
   const paperStyle = {
     padding: '20px 20px 25px 20px',
     // height: '40vh',
-    width: 335,
+    width: 380,
     margin: '18vh auto',
   };
   const theme = createTheme({
@@ -105,7 +82,7 @@ const Register = ({ setAuthentication }) => {
     },
   });
   const signInStyle = { margin: '20px 0 ' };
-  const btnStyle = { margin: '5px 0 15px 0' };
+  const btnStyle = { margin: '5px 0 15px 0', backgroundColor: 'rgba(0, 0, 0, 0.8)' };
   const inputStyle = {
     // padding: '16.5px 14px',
     margin: '10px 0 0 0',
@@ -115,61 +92,132 @@ const Register = ({ setAuthentication }) => {
     fontSize: '12px',
     padding: '0px',
   };
-  const forgotPassStyle = { margin: '0 0 5px 0' };
-  const avatarStyle = { backgroundColor: '#a6c660' };
-  // if (isLoading) {
-  //   return <LoadingScreen />;
-  // }
+  const avatarStyle = { backgroundColor: 'rgba(0, 0, 0, 0.8)' };
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign up
-          </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Grid container direction="column" alignItems="center" style={{ height: '100vh' }}>
+        <Paper elevation={10} style={paperStyle}>
+          <Grid align="center">
+            <Avatar style={avatarStyle}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography variant="h1" style={signInStyle}>
+              Sign Up
+            </Typography>
+          </Grid>
+          <form onSubmit={handleSubmit(submitHandler)}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField autoComplete="given-name" name="firstName" required fullWidth id="firstName" label="First Name" autoFocus />
+                <TextField
+                  name="firstName"
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                  {...register('firstName', {
+                    required: 'First name is required.',
+                    minLength: {
+                      value: 2,
+                      message: 'First name needs to be at least 2 characters',
+                    },
+                  })}
+                  error={Boolean(errors.firstName)}
+                  helperText={errors.firstName?.message}
+                />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField required fullWidth id="lastName" label="Last Name" name="lastName" autoComplete="family-name" />
+                <TextField
+                  name="lastName"
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  autoFocus
+                  {...register('lastName', {
+                    required: 'Last name is required.',
+                    minLength: {
+                      value: 2,
+                      message: 'Last name needs to be at least 2 characters',
+                    },
+                  })}
+                  error={Boolean(errors.lastName)}
+                  helperText={errors.lastName?.message}
+                />
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth id="email" label="Email Address" name="email" autoComplete="email" />
+                <TextField
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoFocus
+                  placeholder="Enter Email"
+                  {...register('email', {
+                    required: 'Email is required.',
+                    maxLength: {
+                      value: 50,
+                      message: 'Exceeded maximum length',
+                    },
+                    pattern: {
+                      value: /^(?!.*\.{2})[a-zA-Z0-9._%+-]{1,38}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                      message: 'Invalid email',
+                    },
+                  })}
+                  error={Boolean(errors.email)}
+                  helperText={errors.email?.message}
+                />
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth name="password" label="Password" type="password" id="password" autoComplete="new-password" />
+                <TextField
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  placeholder="Enter Password"
+                  {...register('password', {
+                    required: 'Password is required.',
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/,
+                      message: 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number',
+                    },
+                  })}
+                  error={Boolean(errors.password)}
+                  helperText={errors.password?.message}
+                />
               </Grid>
               <Grid item xs={12}>
-                <FormControlLabel control={<Checkbox value="allowExtraEmails" color="primary" />} label="I want to receive inspiration, marketing promotions and updates via email." />
+                <FormControlLabel control={<Checkbox value="allowExtraEmails" color="primary" />} label="I want to receive emails." />
               </Grid>
             </Grid>
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-              Sign Up
+            {/* 
+            <TextField
+              label="Password"
+              id="password"
+              placeholder="Enter Password"
+              style={inputStyle}
+              type="password"
+              fullWidth
+              {...register('password', {
+                required: 'Password is required.',
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/,
+                  message: 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number',
+                },
+              })}
+              error={Boolean(errors.password)}
+              helperText={errors.password?.message}
+            /> */}
+            <Button type="submit" color="primary" variant="contained" style={btnStyle} fullWidth>
+              Sign In
             </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/login" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-        <Copyright sx={{ mt: 5 }} />
-      </Container>
+          </form>
+          <Typography variant="h2">
+            Already a user? <Link href="/login">Sign Up</Link>
+          </Typography>
+        </Paper>
+        <Copyright sx={{ mt: 3, position: 'absolute' }} />
+      </Grid>
     </ThemeProvider>
   );
 };

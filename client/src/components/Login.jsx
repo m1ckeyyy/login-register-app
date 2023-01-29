@@ -21,8 +21,6 @@ import { useForm } from 'react-hook-form';
 import '../index.css'; //fonts
 import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
-// import { render, getByLabelText } from 'react';
-// import { Select } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -52,9 +50,10 @@ const Login = ({ setAuthentication }) => {
   } = useForm();
   // const onSubmit = (data) => console.log(data);
   const submitHandler = async (data) => {
+    console.log(data);
     data.rememberMe = rememberMe;
-    reset();
-    fetch('http://localhost:8080/login', {
+
+    fetch('https://qhc5nx-8080.preview.csb.app/login', {
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),
@@ -75,9 +74,11 @@ const Login = ({ setAuthentication }) => {
             secure: true,
             // httpOnly: true,
           });
+          reset();
           setAuthentication(true);
           console.log('Login SET, Token: ', Cookies.get('access_token'));
         } else {
+          //throw errro to user
           console.log('(Loggin.jsx) ERROR: ', res.message);
         }
       })
@@ -87,7 +88,7 @@ const Login = ({ setAuthentication }) => {
   const paperStyle = {
     padding: '20px 20px 25px 20px',
     // height: '40vh',
-    width: 335,
+    width: 360,
     margin: '18vh auto',
   };
   const theme = createTheme({
@@ -103,7 +104,7 @@ const Login = ({ setAuthentication }) => {
     },
   });
   const signInStyle = { margin: '20px 0 ' };
-  const btnStyle = { margin: '5px 0 15px 0' };
+  const btnStyle = { margin: '5px 0 15px 0', backgroundColor: 'rgba(166, 198, 96, 0.8)' };
   const inputStyle = {
     // padding: '16.5px 14px',
     margin: '10px 0 0 0',
@@ -114,7 +115,7 @@ const Login = ({ setAuthentication }) => {
     padding: '0px',
   };
   const forgotPassStyle = { margin: '0 0 5px 0' };
-  const avatarStyle = { backgroundColor: '#a6c660' };
+  const avatarStyle = { backgroundColor: 'rgba(166, 198, 96, 0.8)' };
   return (
     <ThemeProvider theme={theme}>
       <Grid container direction="column" alignItems="center" style={{ height: '100vh' }}>
@@ -129,20 +130,25 @@ const Login = ({ setAuthentication }) => {
           </Grid>
           <form onSubmit={handleSubmit(submitHandler)}>
             <TextField
-              label="Username"
-              id="username"
-              placeholder="Enter Username"
+              label="Email"
+              id="email"
+              placeholder="Enter Email"
               style={inputStyle}
               fullWidth
-              {...register('username', {
-                required: 'Username is required.',
-                minLength: {
-                  value: 5,
-                  message: 'Username needs to be at least 5 characters',
+              autoFocus
+              {...register('email', {
+                required: 'Email is required.',
+                maxLength: {
+                  value: 50,
+                  message: 'Exceeded maximum length',
+                },
+                pattern: {
+                  value: /^(?!.*\.{2})[a-zA-Z0-9._%+-]{1,38}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                  message: 'Invalid email',
                 },
               })}
-              error={Boolean(errors.username)}
-              helperText={errors.username?.message}
+              error={Boolean(errors.email)}
+              helperText={errors.email?.message}
             />
             <TextField
               label="Password"

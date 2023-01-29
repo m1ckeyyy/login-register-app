@@ -10,13 +10,13 @@ import './App.css';
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { authenticated, isLoading, setAuthentication } = useAuth();
-  console.log('render App.jsx, auth: ', authenticated);
+  let { authenticated, isLoading, setIsLoading, setAuthentication } = useAuth();
 
+  console.log('render App.jsx, auth: ', authenticated);
+  var newDate;
   if (isLoading) {
     return <LoadingScreen />;
   }
-
   return (
     <Routes>
       <Route path="/login" element={authenticated ? <Navigate to="/" /> : <Login setAuthentication={setAuthentication} />} />

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import LoadingScreen from './components/LoadingScreen';
@@ -7,8 +6,8 @@ import LoadingScreen from './components/LoadingScreen';
 export const useAuth = () => {
   const [authenticated, setAuthentication] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const navigate = useNavigate();
+  // const location = useLocation();
   const cookies = Cookies.get('access_token');
   //we use 'shoudLock' because of React 18 new functionality of useEffect which runs twice.
   const shouldLock = useRef(true);
@@ -16,14 +15,14 @@ export const useAuth = () => {
     if (shouldLock.current) {
       shouldLock.current = false;
 
-      if (!Cookies.get('access_token')) {
-        console.log('NO COOKIES = NO FETCHING');
-        setIsLoading(false);
-        setAuthentication(false);
-        return;
-      }
+      // if (!cookies) {
+      //   console.log('NO COOKIES = NO FETCHING');
+      //   setIsLoading(false);
+      //   setAuthentication(false);
+      //   return;
+      // }
       console.log('fetching server from useAuth.jsx');
-      fetch('http://localhost:8080/auth', {
+      fetch('https://qhc5nx-8080.preview.csb.app/auth', {
         mode: 'cors',
         headers: {
           Authorization: `Bearer ${Cookies.get('access_token')}`,
@@ -36,10 +35,10 @@ export const useAuth = () => {
           throw new Error('Unauthorized');
         })
         .then((res) => {
+          console.log('res:',res);
           setAuthentication(res.user);
           setIsLoading(false);
         })
-
         .catch((error) => {
           setAuthentication(false);
           setIsLoading(false);
