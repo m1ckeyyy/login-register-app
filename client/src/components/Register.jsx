@@ -20,6 +20,7 @@ import '../index.css'; //fonts
 import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
 import LoadingScreen from './LoadingScreen';
+import usePasswordToggle from './usePasswordToggle';
 
 function Copyright(props) {
   return (
@@ -35,6 +36,8 @@ function Copyright(props) {
 }
 
 const Register = ({ setAuthentication }) => {
+  const [passwordInputType, toggleIcon] = usePasswordToggle();
+
   const navigate = useNavigate();
   const {
     reset,
@@ -54,7 +57,10 @@ const Register = ({ setAuthentication }) => {
       },
     })
       .then((res) => {
-        if (res.ok) reset();
+        if (res.ok) {
+          reset();
+          navigate('/login');
+        }
         return res.json();
       })
       .then((res) => {
@@ -171,7 +177,7 @@ const Register = ({ setAuthentication }) => {
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
+                  type={passwordInputType}
                   id="password"
                   autoComplete="new-password"
                   placeholder="Enter Password"
@@ -184,6 +190,9 @@ const Register = ({ setAuthentication }) => {
                   })}
                   error={Boolean(errors.password)}
                   helperText={errors.password?.message}
+                  InputProps={{
+                    endAdornment: <Button sx={{ color: 'black', maxWidth: 30, maxHeight: 30, minWidth: 30, minHeight: 30 }}>{toggleIcon}</Button>,
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>

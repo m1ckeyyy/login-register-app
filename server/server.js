@@ -76,9 +76,9 @@ app.post('/register', (req, res) => {
 
 app.post('/login', (req, res) => {
   try {
-    let { email, firstName, lastName, password } = req.body;
-    console.log('logging in: ', email, firstName, lastName, '...');
-
+    let { email, password } = req.body;
+    console.log('logging in: ', email, '...');
+    //wyszukaj firstName na podstawie emaila i zapisz go uzywajac payload w jwt.sign()
     User.findOne({ email }).then((user) => {
       if (!user) {
         return res.status(404).send({
@@ -90,20 +90,17 @@ app.post('/login', (req, res) => {
       bcrypt.compare(password, user.password).then((isMatching) => {
         if (isMatching) {
           password = user.password;
-          req.session.authenticated = true;
-          req.session.user = {
-            email,
-            password,
-          };
-          console.log(email, password, firstName, lastName);
-          const payload = { email, firstName, lastName, password };
+          console.log(email, password);
+          const firstName = user.firstName;
+          const lastName = user.lastName;
+          const payload = { email, firstName, lastName };
           const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
-          console.log(payload);
-          // res.json({ accessToken: accessToken });
           res.status(200).send({
             access: true,
             token: accessToken,
             email: email,
+            firstName: firstName,
+            lastName: lastName,
           });
         } else {
           console.log('notMAtching');
@@ -131,10 +128,8 @@ app.get('/auth', (req, res, next) => {
     console.log('user verified with JWT');
     console.log('user::,', user);
     req.user = user;
-    // const firstNamed = user.firstName;
-    // console.log(firstNamed);
     return res.status(200).send({
-      message: `${user} was verified with JWT, grant access to homepage`,
+      message: `${user.firstName} was verified with JWT, grant access to homepage`,
       user: user,
     });
   });

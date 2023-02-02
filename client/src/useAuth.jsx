@@ -35,7 +35,7 @@ export const useAuth = () => {
           throw new Error('Unauthorized');
         })
         .then((res) => {
-          console.log('res:',res);
+          console.log('res:', res);
           setAuthentication(res.user);
           setIsLoading(false);
         })

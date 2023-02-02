@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import './components/FontawesomeIcons/index.js';
 import Login from './components/Login';
 import Home from './components/Home';
 import Register from './components/Register';
@@ -13,7 +14,6 @@ function App() {
   let { authenticated, isLoading, setIsLoading, setAuthentication } = useAuth();
 
   console.log('render App.jsx, auth: ', authenticated);
-  var newDate;
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -21,7 +21,7 @@ function App() {
     <Routes>
       <Route path="/login" element={authenticated ? <Navigate to="/" /> : <Login setAuthentication={setAuthentication} />} />
       <Route path="/register" element={authenticated ? <Navigate to="/" /> : <Register setAuthentication={setAuthentication} />} />
-      <Route path="/" element={authenticated ? <Home /> : <Navigate to="/login" />} />
+      <Route path="/" element={authenticated ? <Home authenticated={authenticated} setAuthentication={setAuthentication} /> : <Navigate to="/login" />} />
     </Routes>
   );
 }

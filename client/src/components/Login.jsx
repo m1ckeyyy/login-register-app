@@ -21,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import '../index.css'; //fonts
 import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
+import usePasswordToggle from './usePasswordToggle';
 
 function Copyright(props) {
   return (
@@ -36,6 +37,7 @@ function Copyright(props) {
 }
 
 const Login = ({ setAuthentication }) => {
+  const [passwordInputType, toggleIcon] = usePasswordToggle();
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
   const handleCheckbox = (e) => {
@@ -67,15 +69,26 @@ const Login = ({ setAuthentication }) => {
         // signIn({ token: res.token, expiresIn: 3600, tokenType: 'Bearer', authState: { username: res.username } });
         console.log(res);
         if (res.access) {
-          console.log(res.token);
+          console.log('remember: ', rememberMe);
+          // console.log('el: ', res);
           Cookies.remove('access_token');
-          Cookies.set('access_token', res.token, {
-            expires: 7,
-            secure: true,
-            // httpOnly: true,
-          });
+          if (rememberMe) {
+            Cookies.set('access_token', res.token, {
+              expires: 100,
+              secure: true,
+              // httpOnly: true,
+            });
+          } else {
+            Cookies.set('access_token', res.token, {
+              expires: 0.5,
+              secure: true,
+              // httpOnly: true,
+            });
+          }
           reset();
-          setAuthentication(true);
+          //run /auth not setAuthentication
+          // useAuth()
+          setAuthentication(res);
           console.log('Login SET, Token: ', Cookies.get('access_token'));
         } else {
           //throw errro to user
@@ -155,7 +168,7 @@ const Login = ({ setAuthentication }) => {
               id="password"
               placeholder="Enter Password"
               style={inputStyle}
-              type="password"
+              type={passwordInputType}
               fullWidth
               {...register('password', {
                 required: 'Password is required.',
@@ -166,7 +179,12 @@ const Login = ({ setAuthentication }) => {
               })}
               error={Boolean(errors.password)}
               helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: <Button sx={{ color: 'rgba(166, 198, 96, 1)', maxWidth: 30, maxHeight: 30, minWidth: 30, minHeight: 30 }}>{toggleIcon}</Button>,
+              }}
             />
+
+            {/* </TextField> */}
             <FormControlLabel control={<Checkbox name="checkedB" color="primary" />} label="Remember me" onClick={handleCheckbox}></FormControlLabel>
             <Button type="submit" color="primary" variant="contained" style={btnStyle} fullWidth>
               Sign In
