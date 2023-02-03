@@ -22,7 +22,7 @@ export const useAuth = () => {
       //   return;
       // }
       console.log('fetching server from useAuth.jsx');
-      fetch('https://qhc5nx-8080.preview.csb.app/auth', {
+      fetch('http://localhost:8080/auth', {
         mode: 'cors',
         headers: {
           Authorization: `Bearer ${Cookies.get('access_token')}`,

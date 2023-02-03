@@ -48,7 +48,7 @@ const Register = ({ setAuthentication }) => {
   } = useForm();
   const submitHandler = async (data) => {
     console.log(data);
-    fetch('https://qhc5nx-8080.preview.csb.app/register', {
+    fetch('http://localhost:8080/register', {
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),

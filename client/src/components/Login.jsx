@@ -52,10 +52,10 @@ const Login = ({ setAuthentication }) => {
   } = useForm();
   // const onSubmit = (data) => console.log(data);
   const submitHandler = async (data) => {
-    console.log(data);
     data.rememberMe = rememberMe;
+    console.log(data);
 
-    fetch('https://qhc5nx-8080.preview.csb.app/login', {
+    fetch('http://localhost:8080/login', {
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),
