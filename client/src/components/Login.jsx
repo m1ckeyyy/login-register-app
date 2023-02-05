@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 // import CssBaseline from '@mui/material/CssBaseline';
@@ -22,6 +22,7 @@ import '../index.css'; //fonts
 import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
 import usePasswordToggle from './usePasswordToggle';
+import UserContext from './../UserContext.js';
 
 function Copyright(props) {
   return (
@@ -36,7 +37,13 @@ function Copyright(props) {
   );
 }
 
-const Login = ({ setAuthentication }) => {
+const Login = () => {
+  // use Context
+  // const { noti, setNoti } = useContext(NotificationContext);
+  // console.log(noti, setNoti);
+  const { setAuthentication, authenticated, loginNotify } = useContext(UserContext);
+  // console.log('AU: ', authenticated);
+
   const [passwordInputType, toggleIcon] = usePasswordToggle();
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
@@ -65,9 +72,7 @@ const Login = ({ setAuthentication }) => {
     })
       .then((res) => res.json())
       .then((res) => {
-        //
-        // signIn({ token: res.token, expiresIn: 3600, tokenType: 'Bearer', authState: { username: res.username } });
-        console.log(res);
+        //console.log(res);
         if (res.access) {
           console.log('remember: ', rememberMe);
           // console.log('el: ', res);
@@ -85,13 +90,13 @@ const Login = ({ setAuthentication }) => {
               // httpOnly: true,
             });
           }
+          // setNoti(true);
+          // console.log('noti: ', noti);
+          loginNotify();
           reset();
-          //run /auth not setAuthentication
-          // useAuth()
           setAuthentication(res);
           console.log('Login SET, Token: ', Cookies.get('access_token'));
         } else {
-          //throw errro to user
           console.log('(Loggin.jsx) ERROR: ', res.message);
         }
       })
