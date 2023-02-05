@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -21,6 +21,7 @@ import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
 import LoadingScreen from './LoadingScreen';
 import usePasswordToggle from './usePasswordToggle';
+import UserContext from './../UserContext.js';
 
 function Copyright(props) {
   return (
@@ -35,7 +36,9 @@ function Copyright(props) {
   );
 }
 
-const Register = ({ setAuthentication }) => {
+const Register = () => {
+  const { setAuthentication, authenticated, registerNotify } = useContext(UserContext);
+  // const { registerNoti, setRegisterNoti, loginNoti, setLoginNoti } = NotificationContext();
   const [passwordInputType, toggleIcon] = usePasswordToggle();
 
   const navigate = useNavigate();
@@ -59,6 +62,7 @@ const Register = ({ setAuthentication }) => {
       .then((res) => {
         if (res.ok) {
           reset();
+          registerNotify()
           navigate('/login');
         }
         return res.json();

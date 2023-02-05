@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserContext from './../UserContext.js';
 
 import Cookies from 'js-cookie';
 import AppBar from '@mui/material/AppBar';
@@ -27,8 +28,9 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 // }
 // export default Home;
 
-function Home(props) {
-  const { authenticated, setAuthentication } = props;
+function Home() {
+  const { setAuthentication, authenticated, logoutNotify } = useContext(UserContext);
+
   const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -49,6 +51,7 @@ function Home(props) {
     setAnchorElUser(null);
   };
   const logoutHandler = () => {
+    logoutNotify();
     console.log('Aaa');
     Cookies.remove('access_token');
     setAuthentication(false);
