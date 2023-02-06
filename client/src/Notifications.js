@@ -3,13 +3,40 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const loginNotify = () => {
-  toast('🔓 Logged in');
+  toast.success('🔓 Logged in', {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: 'colored',
+  });
 };
 
 export const registerNotify = () => {
-  toast('🎉 Successfully registered');
+  toast.success('🎉 Successfully registered', {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: 'colored',
+  });
 };
 
 export const logoutNotify = () => {
-  toast('⬅ Logged out');
+  toast.info('⬅ Logged out', {
+    position: 'bottom-right',
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: 'colored',
+  });
 };

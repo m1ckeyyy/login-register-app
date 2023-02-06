@@ -70,7 +70,6 @@ app.post('/register', (req, res) => {
       res.status(500).send('Error saving user to database');
     } else {
       console.log('user yes');
-      //   req.flash("success", "You are now registered and can log in");
       res.status(200).json({ redirect: '/login' });
     }
   });
