@@ -41,7 +41,7 @@ const Login = () => {
   // use Context
   // const { noti, setNoti } = useContext(NotificationContext);
   // console.log(noti, setNoti);
-  const { setAuthentication, authenticated, loginNotify } = useContext(UserContext);
+  const { setAuthentication, authenticated, loginNotify, incorrectCredentialsNotify } = useContext(UserContext);
   // console.log('AU: ', authenticated);
 
   const [passwordInputType, toggleIcon] = usePasswordToggle();
@@ -70,37 +70,17 @@ const Login = () => {
         'Content-Type': 'application/json',
       },
     })
-      .then((res) => res.json())
       .then((res) => {
-        //console.log(res);
-        if (res.access) {
-          console.log('remember: ', rememberMe);
-          // console.log('el: ', res);
-          Cookies.remove('access_token');
-          if (rememberMe) {
-            Cookies.set('access_token', res.token, {
-              expires: 100,
-              secure: true,
-              // httpOnly: true,
-            });
-          } else {
-            Cookies.set('access_token', res.token, {
-              expires: 0.5,
-              secure: true,
-              // httpOnly: true,
-            });
-          }
-          // setNoti(true);
-          // console.log('noti: ', noti);
+        if (res.status === 200) {
           loginNotify();
           reset();
-          setAuthentication(res);
-          console.log('Login SET, Token: ', Cookies.get('access_token'));
-        } else {
-          console.log('(Loggin.jsx) ERROR: ', res.message);
+          return res.json();
+        } else if (res.status === 401 || res.status === 404) {
+          incorrectCredentialsNotify();
         }
       })
-      .catch((error) => console.error('Failed to fetch, check if server is up and running: ', error));
+      .then((res) => setAuthentication(res))
+      .catch((error) => console.error(error));
   };
 
   const paperStyle = {

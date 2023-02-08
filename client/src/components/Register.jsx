@@ -37,7 +37,7 @@ function Copyright(props) {
 }
 
 const Register = () => {
-  const { setAuthentication, authenticated, registerNotify } = useContext(UserContext);
+  const { setAuthentication, authenticated, registerNotify, emailTakenNotify } = useContext(UserContext);
   // const { registerNoti, setRegisterNoti, loginNoti, setLoginNoti } = NotificationContext();
   const [passwordInputType, toggleIcon] = usePasswordToggle();
 
@@ -62,15 +62,23 @@ const Register = () => {
       .then((res) => {
         if (res.ok) {
           reset();
-          registerNotify()
+          registerNotify();
           navigate('/login');
         }
-        return res.json();
+        return res;
       })
       .then((res) => {
-        console.log(res);
+        if (res.status === 409) {
+          emailTakenNotify();
+        }
+        if (res.status === 400) {
+          validationErrorNotify();
+        }
+        if (res.status === 500) {
+          databaseErrorNotify();
+        }
       })
-      .catch((error) => console.error('Failed to fetch, check if server is up and running: ', error));
+      .catch((error) => console.log('ye: ', error));
   };
 
   const paperStyle = {

@@ -10,7 +10,7 @@ import UserContext from './UserContext.js';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
 
-import { loginNotify, registerNotify, logoutNotify } from './Notifications.js';
+import { loginNotify, registerNotify, logoutNotify, emailTakenNotify, validationErrorNotify, incorrectCredentialsNotify, databaseErrorNotify } from './Notifications.js';
 
 function App() {
   const navigate = useNavigate();
@@ -23,7 +23,21 @@ function App() {
   }
   return (
     <>
-      <UserContext.Provider value={{ authenticated, isLoading, setIsLoading, setAuthentication, loginNotify, registerNotify, logoutNotify }}>
+      <UserContext.Provider
+        value={{
+          authenticated,
+          isLoading,
+          setIsLoading,
+          setAuthentication,
+          loginNotify,
+          registerNotify,
+          logoutNotify,
+          emailTakenNotify,
+          validationErrorNotify,
+          incorrectCredentialsNotify,
+          databaseErrorNotify,
+        }}
+      >
         <Routes>
           <Route path="/login" element={authenticated ? <Navigate to="/" /> : <Login />} />
           <Route path="/register" element={authenticated ? <Navigate to="/" /> : <Register />} />

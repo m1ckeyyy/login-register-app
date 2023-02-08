@@ -53,8 +53,8 @@ app.post('/', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  // DENY DUPLICATE USERNAMES
   const { email, firstName, lastName, password } = req.body;
+  email = email.toLowerCase();
   const newUser = new User({ firstName, lastName, email, password });
 
   console.log('server.js,/register,newUser: ', newUser);
@@ -64,28 +64,32 @@ app.post('/register', (req, res) => {
     console.log(message);
     return res.status(400).send({ error: message });
   }
-  newUser.save((error) => {
-    if (error) {
-      console.log(error);
-      res.status(500).send('Error saving user to database');
-    } else {
-      console.log('user yes');
-      res.status(200).json({ redirect: '/login' });
+  User.findOne({ email }).then((user) => {
+    if (user) {
+      console.log('There is already a user with that email');
+      return res.status(409).send({ error: 'There is already a user with that email' });
     }
+    newUser.save((error) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('Error saving user to database');
+      } else {
+        console.log('user yes');
+        res.status(200).json({ redirect: '/login' });
+      }
+    });
   });
 });
 
 app.post('/login', (req, res) => {
   try {
-    let { email, password } = req.body;
-    console.log('logging in: ', email, '...');
+    let { email, password, rememberMe } = req.body;
+    email = email.toLowerCase();
+    console.log('logging in: ', email, 'remember: ', rememberMe);
     //wyszukaj firstName na podstawie emaila i zapisz go uzywajac payload w jwt.sign()
     User.findOne({ email }).then((user) => {
       if (!user) {
-        return res.status(404).send({
-          access: false,
-          message: `user ${email} not found, authorization failed`,
-        });
+        return res.status(404).send(`Invalid email or password`);
       }
 
       bcrypt.compare(password, user.password).then((isMatching) => {
@@ -96,16 +100,17 @@ app.post('/login', (req, res) => {
           const lastName = user.lastName;
           const payload = { email, firstName, lastName };
           const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
+          const maxAge = rememberMe ? 1000 * 60 * 60 * 24 * 365 : 1000 * 60 * 60 * 24 * 7;
+          res.cookie('access_token', accessToken, { maxAge });
+
           res.status(200).send({
-            access: true,
-            token: accessToken,
             email: email,
             firstName: firstName,
             lastName: lastName,
           });
         } else {
           console.log('notMAtching');
-          res.status(401).send({ access: false, message: 'Incorrect password' });
+          res.status(401).send({ message: 'Incorrect password' });
         }
       });
     });
