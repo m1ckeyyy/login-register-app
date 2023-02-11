@@ -22,6 +22,7 @@ import { useAuth } from './../useAuth.jsx';
 import LoadingScreen from './LoadingScreen';
 import usePasswordToggle from './usePasswordToggle';
 import UserContext from './../UserContext.js';
+import { registerNotify, emailTakenNotify, databaseErrorNotify } from './../Notifications.js';
 
 function Copyright(props) {
   return (
@@ -37,8 +38,7 @@ function Copyright(props) {
 }
 
 const Register = () => {
-  const { setAuthentication, authenticated, registerNotify, emailTakenNotify } = useContext(UserContext);
-  // const { registerNoti, setRegisterNoti, loginNoti, setLoginNoti } = NotificationContext();
+  const { setAuthentication, authenticated } = useContext(UserContext);
   const [passwordInputType, toggleIcon] = usePasswordToggle();
 
   const navigate = useNavigate();
@@ -51,7 +51,8 @@ const Register = () => {
   } = useForm();
   const submitHandler = async (data) => {
     console.log(data);
-    fetch('http://localhost:8080/register', {
+    fetch('https://qhc5nx-8080.preview.csb.app/register', {
+      //https://qhc5nx-8080.preview.csb.app/register
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),

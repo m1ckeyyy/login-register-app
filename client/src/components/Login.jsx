@@ -23,6 +23,7 @@ import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
 import usePasswordToggle from './usePasswordToggle';
 import UserContext from './../UserContext.js';
+import { loginNotify, incorrectCredentialsNotify } from './../Notifications.js';
 
 function Copyright(props) {
   return (
@@ -41,7 +42,7 @@ const Login = () => {
   // use Context
   // const { noti, setNoti } = useContext(NotificationContext);
   // console.log(noti, setNoti);
-  const { setAuthentication, authenticated, loginNotify, incorrectCredentialsNotify } = useContext(UserContext);
+  const { setAuthentication, authenticated } = useContext(UserContext);
   // console.log('AU: ', authenticated);
 
   const [passwordInputType, toggleIcon] = usePasswordToggle();
@@ -62,7 +63,8 @@ const Login = () => {
     data.rememberMe = rememberMe;
     console.log(data);
 
-    fetch('http://localhost:8080/login', {
+    fetch('https://qhc5nx-8080.preview.csb.app/login', {
+      //https://qhc5nx-8080.preview.csb.app/login
       credentials: 'include',
       method: 'POST',
       body: JSON.stringify(data),

@@ -10,8 +10,6 @@ import UserContext from './UserContext.js';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
 
-import { loginNotify, registerNotify, logoutNotify, emailTakenNotify, validationErrorNotify, incorrectCredentialsNotify, databaseErrorNotify } from './Notifications.js';
-
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,13 +27,6 @@ function App() {
           isLoading,
           setIsLoading,
           setAuthentication,
-          loginNotify,
-          registerNotify,
-          logoutNotify,
-          emailTakenNotify,
-          validationErrorNotify,
-          incorrectCredentialsNotify,
-          databaseErrorNotify,
         }}
       >
         <Routes>

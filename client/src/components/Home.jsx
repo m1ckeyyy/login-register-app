@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from './../UserContext.js';
+import { logoutNotify } from './../Notifications.js';
 
 import Cookies from 'js-cookie';
 import AppBar from '@mui/material/AppBar';
@@ -29,7 +30,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 // export default Home;
 
 function Home() {
-  const { setAuthentication, authenticated, logoutNotify } = useContext(UserContext);
+  const { setAuthentication, authenticated } = useContext(UserContext);
 
   const navigate = useNavigate();
 

@@ -13,14 +13,14 @@ require('dotenv').config();
 const uri = process.env.MONGO_URI;
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://qhc5nx-5173.preview.csb.app', //https://qhc5nx-5173.preview.csb.app
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
 );
 app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', 'https://qhc5nx-5173.preview.csb.app');
-  res.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.set('Access-Control-Allow-Origin', 'https://qhc5nx-5173.preview.csb.app'); //https://qhc5nx-5173.preview.csb.app
+  // res.set('Access-Control-Allow-Origin', 'http://localhost:5173'); //https://qhc5nx-5173.preview.csb.app
 
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -53,7 +53,7 @@ app.post('/', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const { email, firstName, lastName, password } = req.body;
+  let { email, firstName, lastName, password } = req.body;
   email = email.toLowerCase();
   const newUser = new User({ firstName, lastName, email, password });
 
