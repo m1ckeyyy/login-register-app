@@ -100,9 +100,8 @@ app.post('/login', (req, res) => {
           const lastName = user.lastName;
           const payload = { email, firstName, lastName };
           const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
-          const maxAge = rememberMe ? 1000 * 60 * 60 * 24 * 365 : 1000 * 60 * 60 * 24 * 7;
-          res.cookie('access_token', accessToken, { maxAge });
-
+          const maxAge = rememberMe ? 21600000 : 21600000;
+          res.cookie('access_token', accessToken, { httpOnly: false, secure: false });
           res.status(200).send({
             email: email,
             firstName: firstName,
@@ -121,6 +120,7 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/auth', (req, res, next) => {
+  console.log('RRR:', req.cookies.access_token);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (token == 'undefined') {
@@ -151,6 +151,14 @@ app.get('/logout', (req, res) => {
     }
   });
 });
+
+app.post('/test', (req, res) => {
+  res.setHeader('Set-Cookie', [`test_token=HAHA; HttpOnly; Secure; SameSite=Strict`]);
+  res.status(200).send({
+    message: 'test token sent',
+  });
+});
+
 function authenticateToken(req, res, next) {
   const token = req.headers && req.headers.cookie.split(' ')[1];
   if (token == null) return res.status(401);

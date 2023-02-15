@@ -17,23 +17,21 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import CardMedia from '@mui/material/CardMedia';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
-// function Home(props) {
-//   const { authenticated } = props;
-//   console.log('a: ', authenticated, authenticated.firstName);
-
-//   return <h1>Dzien dobry {authenticated.firstName}!</h1>;
-// }
-// export default Home;
 
 function Home() {
   const { setAuthentication, authenticated } = useContext(UserContext);
 
   const navigate = useNavigate();
-
+  const fetcher = function () {
+    console.log('fetcher');
+    fetch('https://qhc5nx-8080.preview.csb.app/test', { method: 'POST', mode: 'cors' })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  };
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -61,6 +59,7 @@ function Home() {
   };
   return (
     <>
+      <Button onClick={fetcher} />
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
@@ -142,7 +141,7 @@ function Home() {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={authenticated.firstName} src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={authenticated.firstName} />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -170,9 +169,10 @@ function Home() {
             </Box>
           </Toolbar>
         </Container>
+        <CardMedia component="img" alt="bg-img" height="140" image="/img/home-bg-img.png" />
       </AppBar>
 
-      <h1 sx={{ color: 'red' }}>Welcome {authenticated.firstName}!</h1>
+      <h1 sx={{ mt: '5', color: 'blue' }}>Welcome {authenticated.firstName}!</h1>
     </>
   );
 }

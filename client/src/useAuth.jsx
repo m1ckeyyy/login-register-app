@@ -9,6 +9,7 @@ export const useAuth = () => {
   // const navigate = useNavigate();
   // const location = useLocation();
   const cookies = Cookies.get('access_token');
+  console.log('cokies: ', document.cookie);
   //we use 'shoudLock' because of React 18 new functionality of useEffect which runs twice.
   const shouldLock = useRef(true);
   useEffect(() => {
