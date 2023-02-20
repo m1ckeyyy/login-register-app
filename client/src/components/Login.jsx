@@ -5,7 +5,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+// import Link from '@mui/material/Link';
+import { Link } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
 // import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
@@ -29,7 +30,7 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" target="_blank" href="https://github.com/m1ckeyyy">
+      <Link color="inherit" target="_blank" to="https://github.com/m1ckeyyy">
         m1ckeyyy
       </Link>{' '}
       {new Date().getFullYear()}
@@ -103,6 +104,7 @@ const Login = () => {
       },
     },
   });
+
   const signInStyle = { margin: '20px 0 ' };
   const btnStyle = { margin: '5px 0 15px 0', backgroundColor: 'rgba(166, 198, 96, 0.8)' };
   const inputStyle = {
@@ -116,6 +118,10 @@ const Login = () => {
   };
   const forgotPassStyle = { margin: '0 0 5px 0' };
   const avatarStyle = { backgroundColor: 'rgba(166, 198, 96, 0.8)' };
+  const registerRouteStyle = {
+    color: 'black',
+    fontSize: '13px',
+  };
   return (
     <ThemeProvider theme={theme}>
       <Grid container direction="column" alignItems="center" style={{ height: '100vh' }}>
@@ -178,12 +184,15 @@ const Login = () => {
             </Button>
           </form>
           <Typography variant="h2" style={forgotPassStyle}>
-            <Link href="#" target="_blank">
+            <Link to="#" target="_blank">
               Forgot password?
             </Link>
           </Typography>
           <Typography variant="h2">
-            Don't have an account? <Link href="/register">Sign Up</Link>
+            Don't have an account?{' '}
+            <Link to="/register">
+              <Button style={registerRouteStyle}>Sign Up</Button>
+            </Link>
           </Typography>
         </Paper>
         <Copyright sx={{ mt: 3, position: 'absolute' }} />

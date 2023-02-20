@@ -5,7 +5,10 @@ import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CssBaseline from '@mui/material/CssBaseline';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
+
+// import Link from '@mui/material/Link';
+import { Link } from 'react-router-dom';
+
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
@@ -89,6 +92,7 @@ const Register = () => {
     margin: '18vh auto',
   };
   const theme = createTheme({
+    
     typography: {
       fontFamily: 'Roboto Mono',
       h1: {
@@ -100,6 +104,7 @@ const Register = () => {
       },
     },
   });
+
   const signInStyle = { margin: '20px 0 ' };
   const btnStyle = { margin: '5px 0 15px 0', backgroundColor: 'rgba(0, 0, 0, 0.8)' };
   const inputStyle = {
@@ -111,6 +116,11 @@ const Register = () => {
     fontSize: '12px',
     padding: '0px',
   };
+  const loginRouteStyle = {
+    color: 'black',
+    fontSize: '13px',
+  };
+
   const avatarStyle = { backgroundColor: 'rgba(0, 0, 0, 0.8)' };
   return (
     <ThemeProvider theme={theme}>
@@ -150,7 +160,6 @@ const Register = () => {
                   fullWidth
                   id="lastName"
                   label="Last Name"
-                  autoFocus
                   {...register('lastName', {
                     required: 'Last name is required.',
                     minLength: {
@@ -168,7 +177,6 @@ const Register = () => {
                   id="email"
                   label="Email Address"
                   name="email"
-                  autoFocus
                   placeholder="Enter Email"
                   {...register('email', {
                     required: 'Email is required.',
@@ -212,30 +220,15 @@ const Register = () => {
                 <FormControlLabel control={<Checkbox value="allowExtraEmails" color="primary" />} label="I want to receive emails." />
               </Grid>
             </Grid>
-            {/* 
-            <TextField
-              label="Password"
-              id="password"
-              placeholder="Enter Password"
-              style={inputStyle}
-              type="password"
-              fullWidth
-              {...register('password', {
-                required: 'Password is required.',
-                pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/,
-                  message: 'Password must be at least 8 characters, contain at least one uppercase letter, one lowercase letter and one number',
-                },
-              })}
-              error={Boolean(errors.password)}
-              helperText={errors.password?.message}
-            /> */}
             <Button type="submit" color="primary" variant="contained" style={btnStyle} fullWidth>
               Sign In
             </Button>
           </form>
           <Typography variant="h2">
-            Already a user? <Link href="/login">Sign Up</Link>
+            Already a user?{' '}
+            <Link to="/login">
+              <Button style={loginRouteStyle}>Sign Up</Button>
+            </Link>
           </Typography>
         </Paper>
         <Copyright sx={{ mt: 3, position: 'absolute' }} />
