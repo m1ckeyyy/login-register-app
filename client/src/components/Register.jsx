@@ -54,7 +54,7 @@ const Register = () => {
   } = useForm();
   const submitHandler = async (data) => {
     console.log(data);
-    fetch('https://qhc5nx-8080.preview.csb.app/register', {
+    fetch('htts://localhost:8080/register', {
       //https://qhc5nx-8080.preview.csb.app/register
       credentials: 'include',
       method: 'POST',
@@ -92,7 +92,6 @@ const Register = () => {
     margin: '18vh auto',
   };
   const theme = createTheme({
-    
     typography: {
       fontFamily: 'Roboto Mono',
       h1: {

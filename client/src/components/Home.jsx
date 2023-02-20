@@ -28,7 +28,7 @@ function Home() {
   const navigate = useNavigate();
   const fetcher = function () {
     console.log('fetcher');
-    fetch('https://qhc5nx-8080.preview.csb.app/test', { method: 'POST', mode: 'cors' })
+    fetch('http://localhost:8080/test', { credentials: 'include', method: 'POST', mode: 'cors' })
       .then((res) => res.json())
       .then((data) => console.log(data));
   };

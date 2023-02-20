@@ -64,7 +64,7 @@ const Login = () => {
     data.rememberMe = rememberMe;
     console.log(data);
 
-    fetch('https://qhc5nx-8080.preview.csb.app/login', {
+    fetch('http://localhost:8080/login', {
       //https://qhc5nx-8080.preview.csb.app/login
       credentials: 'include',
       method: 'POST',

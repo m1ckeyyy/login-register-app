@@ -13,13 +13,13 @@ require('dotenv').config();
 const uri = process.env.MONGO_URI;
 app.use(
   cors({
-    origin: 'https://qhc5nx-5173.preview.csb.app', //https://qhc5nx-5173.preview.csb.app
+    origin: 'http://localhost:5173', //https://qhc5nx-5173.preview.csb.app
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
 );
 app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', 'https://qhc5nx-5173.preview.csb.app'); //https://qhc5nx-5173.preview.csb.app
+  res.set('Access-Control-Allow-Origin', 'http://localhost:5173'); //https://qhc5nx-5173.preview.csb.app
   // res.set('Access-Control-Allow-Origin', 'http://localhost:5173'); //https://qhc5nx-5173.preview.csb.app
 
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -153,7 +153,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.post('/test', (req, res) => {
-  res.setHeader('Set-Cookie', [`test_token=HAHA; HttpOnly; Secure; SameSite=Strict`]);
+  res.cookie('access_tokend', 'accessTokend', { httpOnly: false, secure: false });
   res.status(200).send({
     message: 'test token sent',
   });
