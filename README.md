@@ -13,19 +13,30 @@ It features a frontend implemented using HTML, CSS, and JavaScript, and a backen
 
 1. Clone the repository
 
-`git clone https://github.com/your-username/project-name`
+`git clone https://github.com/m1ckeyyy/habit-tracker.git`
 
-2. Getting Started
+2. Download packages
 
-`cd project-name`
+`cd client`
+`cd server`
 
 `npm install`
 
-3. Set up a MongoDB database and update the connection string in server.js
+3. Set up your MongoDB Atlas account and create a new cluster.
 
-4. Start the server
+4. Create a .env file in the root directory of the project and add the following variables, replacing the values with your own:
 
-`node server.js`
+`MONGO_URI='mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/<database-name>?retryWrites=true&w=majority'
+ACCESS_TOKEN_SECRET='<your-access-token-secret>'
+PORT=<your-port-number>`
+
+5. Start both servers.
+
+`npx nodemon server`
+
+
+`npm run dev`
+
 
 ## Usage
 
@@ -35,18 +46,6 @@ It features a frontend implemented using HTML, CSS, and JavaScript, and a backen
 4. If the login or registration was successful, you will be redirected to the home page.
 5. To log out, simply close the browser or navigate to a different website.
 
-## Configuration
-
-- Create a file `config.js`
-
-- Paste the code below replacing with your personal mongoDB URI
-
-  - `module.exports = {
-mongoURI:
-	"mongodb+srv://<username>:<password>@<your-cluster-url>
-};`
-
-### You can customize the port number and other settings in `server.js`.
 
 #### License: [MIT](https://github.com/m1ckeyyy/habit-tracker/blob/master/LICENSE)
 
