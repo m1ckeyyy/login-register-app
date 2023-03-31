@@ -3,6 +3,11 @@
 This project is a simple login and registration web application built using Node.js, Express, and MongoDB.
 It features a frontend implemented using HTML, CSS, and JavaScript, and a backend server that handles user authentication and stores user data in a MongoDB database.
 
+
+![Overview Image](./overview.png)
+
+
+
 ## Requirements
 
 - Node.js
@@ -49,4 +54,3 @@ PORT=<your-port-number>`
 
 #### License: [MIT](https://github.com/m1ckeyyy/habit-tracker/blob/master/LICENSE)
 
-![Overview Image](./overview.png)
