@@ -1,31 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-// import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-// import Link from '@mui/material/Link';
 import { Link } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
-// import Box from "@mui/material/Box";
 import Grid from '@mui/material/Grid';
-// import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-// import { blue, deepPurple } from "@mui/material/colors";
 import LoginIcon from '@mui/icons-material/Login';
-// import CardMedia from "@mui/material/CardMedia";
-// import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
-import '../index.css'; //fonts
+import '../index.css';
 import { Form, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from './../useAuth.jsx';
 import usePasswordToggle from './usePasswordToggle';
 import UserContext from './../UserContext.js';
 import { loginNotify, incorrectCredentialsNotify } from './../Notifications.js';
-
+import axios from 'axios';
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -40,11 +33,7 @@ function Copyright(props) {
 }
 
 const Login = () => {
-  // use Context
-  // const { noti, setNoti } = useContext(NotificationContext);
-  // console.log(noti, setNoti);
   const { setAuthentication, authenticated } = useContext(UserContext);
-  // console.log('AU: ', authenticated);
 
   const [passwordInputType, toggleIcon] = usePasswordToggle();
   const navigate = useNavigate();
@@ -59,31 +48,28 @@ const Login = () => {
     watch,
     formState: { errors },
   } = useForm();
-  // const onSubmit = (data) => console.log(data);
   const submitHandler = async (data) => {
     data.rememberMe = rememberMe;
     console.log(data);
 
-    fetch('http://localhost:8080/login', {
-      //https://qhc5nx-8080.preview.csb.app/login
-      credentials: 'include',
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          loginNotify();
-          reset();
-          return res.json();
-        } else if (res.status === 401 || res.status === 404) {
-          incorrectCredentialsNotify();
-        }
-      })
-      .then((res) => setAuthentication(res))
-      .catch((error) => console.error(error));
+    try {
+      const response = await axios.post('http://127.0.0.1:8080/login', data, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        loginNotify();
+        reset();
+        setAuthentication(response.data);
+      } else if (response.status === 401 || response.status === 404) {
+        incorrectCredentialsNotify();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const paperStyle = {

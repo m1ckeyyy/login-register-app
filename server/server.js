@@ -13,13 +13,13 @@ require('dotenv').config();
 const uri = process.env.MONGO_URI;
 app.use(
   cors({
-    origin: 'http://localhost:5173', //https://qhc5nx-5173.preview.csb.app
+    origin: 'http://127.0.0.1:5173', //https://qhc5nx-5173.preview.csb.app
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
 );
 app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', 'http://localhost:5173'); //https://qhc5nx-5173.preview.csb.app
+  res.set('Access-Control-Allow-Origin', 'http://127.0.0.1:5173'); //https://qhc5nx-5173.preview.csb.app
   // res.set('Access-Control-Allow-Origin', 'http://localhost:5173'); //https://qhc5nx-5173.preview.csb.app
 
   res.setHeader('Access-Control-Allow-Credentials', true);

@@ -26,6 +26,7 @@ import LoadingScreen from './LoadingScreen';
 import usePasswordToggle from './usePasswordToggle';
 import UserContext from './../UserContext.js';
 import { registerNotify, emailTakenNotify, databaseErrorNotify } from './../Notifications.js';
+import axios from 'axios';
 
 function Copyright(props) {
   return (
@@ -54,35 +55,29 @@ const Register = () => {
   } = useForm();
   const submitHandler = async (data) => {
     console.log(data);
-    fetch('htts://localhost:8080/register', {
-      //https://qhc5nx-8080.preview.csb.app/register
-      credentials: 'include',
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          reset();
-          registerNotify();
-          navigate('/login');
-        }
-        return res;
-      })
-      .then((res) => {
-        if (res.status === 409) {
-          emailTakenNotify();
-        }
-        if (res.status === 400) {
-          validationErrorNotify();
-        }
-        if (res.status === 500) {
-          databaseErrorNotify();
-        }
-      })
-      .catch((error) => console.log('ye: ', error));
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8080/register', data, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        reset();
+        registerNotify();
+        navigate('/login');
+      } else if (response.status === 409) {
+        emailTakenNotify();
+      } else if (response.status === 400) {
+        validationErrorNotify();
+      } else if (response.status === 500) {
+        databaseErrorNotify();
+      }
+    } catch (error) {
+      console.log('ye: ', error);
+    }
   };
 
   const paperStyle = {
