@@ -1,4 +1,4 @@
-# Fullstack Habit Tracker App
+# Fullstack Login Register App
 
 This project is a simple login and registration web application built using Node.js, Express, and MongoDB.
 It features a frontend implemented using HTML, CSS, and JavaScript, and a backend server that handles user authentication and stores user data in a MongoDB database.
@@ -18,7 +18,7 @@ It features a frontend implemented using HTML, CSS, and JavaScript, and a backen
 
 1. Clone the repository
 
-`git clone https://github.com/m1ckeyyy/habit-tracker.git`
+`git clone https://github.com/m1ckeyyy/login-register-app.git`
 
 2. Download packages
 
@@ -52,5 +52,5 @@ PORT=<your-port-number>`
 5. To log out, simply close the browser or navigate to a different website.
 
 
-#### License: [MIT](https://github.com/m1ckeyyy/habit-tracker/blob/master/LICENSE)
+#### License: [MIT](https://github.com/m1ckeyyy/login-register-app/blob/master/LICENSE)
 
